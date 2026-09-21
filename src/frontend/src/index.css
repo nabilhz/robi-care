@@ -1,0 +1,259 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/SpaceGrotesk.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 300 700;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/assets/fonts/Satoshi.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 300 900;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/assets/fonts/JetBrainsMono.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 800;
+}
+
+@layer base {
+  :root {
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "Satoshi", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --radius: 0.75rem;
+
+    /* Robi Care — SAAAS dark navy + bright cyan system (dark-first) */
+    --background: 0.222 0.0355 247.14; /* #0D1B2A page canvas */
+    --foreground: 0.941 0.0093 247.86; /* #E8EEF5 light text */
+    --card: 0.2863 0.0435 246.75; /* #16293D card surface, lighter than canvas */
+    --card-foreground: 0.941 0.0093 247.86;
+    --popover: 0.2863 0.0435 246.75;
+    --popover-foreground: 0.941 0.0093 247.86;
+
+    /* Bright cyan #22D3EE — the single accent, replaces gold and green */
+    --primary: 0.789 0.1377 211.53; /* #22D3EE */
+    --primary-foreground: 0.222 0.0355 247.14; /* dark navy label on cyan */
+
+    /* Deeper navy #0A1628 for hero scrim, CTA bands, and footer.
+       Never pure black; keeps the navy hue family of --background. */
+    --deep-green: 0.1807 0.0338 249.16; /* #0A1628 */
+
+    --secondary: 0.2863 0.0435 246.75; /* #16293D raised navy surface */
+    --secondary-foreground: 0.789 0.1377 211.53; /* cyan outline-button text */
+    --muted: 0.257 0.038 247.0; /* #12243A alternate section band */
+    --muted-foreground: 0.7023 0.0337 246.14; /* #8FA3B8 secondary text */
+
+    --accent: 0.789 0.1377 211.53; /* #22D3EE cyan */
+    --accent-foreground: 0.222 0.0355 247.14;
+
+    --destructive: 0.645 0.2154 16.44; /* #F43F5E alert rose */
+    --destructive-foreground: 0.941 0.0093 247.86;
+
+    --success: 0.789 0.1377 211.53;
+    --warning: 0.82 0.165 85.0;
+
+    /* Warm gold #D4A72C — wordmark accent for the "Robi" half of the logo */
+    --gold: 0.7605 0.1365 84.6;
+
+    /* Original brand emerald #1F7A4C — the "Care" half of the wordmark and
+       the circular mark's leaf forms, restored from the supplied logo. */
+    --brand-green: 0.5203 0.1089 158.4;
+    --brand-green-light: 0.7562 0.1052 165.5; /* #6CC7A0 mint leaf tip */
+
+    --border: 0.345 0.046 246.2; /* #1E3A52 thin subtle border */
+    --input: 0.345 0.046 246.2;
+    --ring: 0.789 0.1377 211.53;
+
+    --chart-1: 0.789 0.1377 211.53;
+    --chart-2: 0.7023 0.0337 246.14;
+    --chart-3: 0.941 0.0093 247.86;
+    --chart-4: 0.2863 0.0435 246.75;
+    --chart-5: 0.645 0.2154 16.44;
+
+    --sidebar: 0.1807 0.0338 249.16;
+    --sidebar-foreground: 0.941 0.0093 247.86;
+    --sidebar-primary: 0.789 0.1377 211.53;
+    --sidebar-primary-foreground: 0.222 0.0355 247.14;
+    --sidebar-accent: 0.2863 0.0435 246.75;
+    --sidebar-accent-foreground: 0.941 0.0093 247.86;
+    --sidebar-border: 0.345 0.046 246.2;
+    --sidebar-ring: 0.789 0.1377 211.53;
+  }
+
+  /* Dark is the primary presentation; .dark mirrors :root so the class
+     toggle (if ever applied) is a no-op rather than a light flash. */
+  .dark {
+    --background: 0.222 0.0355 247.14;
+    --foreground: 0.941 0.0093 247.86;
+    --card: 0.2863 0.0435 246.75;
+    --card-foreground: 0.941 0.0093 247.86;
+    --popover: 0.2863 0.0435 246.75;
+    --popover-foreground: 0.941 0.0093 247.86;
+
+    --primary: 0.789 0.1377 211.53;
+    --primary-foreground: 0.222 0.0355 247.14;
+
+    --deep-green: 0.1807 0.0338 249.16;
+
+    --secondary: 0.2863 0.0435 246.75;
+    --secondary-foreground: 0.789 0.1377 211.53;
+    --muted: 0.257 0.038 247.0;
+    --muted-foreground: 0.7023 0.0337 246.14;
+
+    --accent: 0.789 0.1377 211.53;
+    --accent-foreground: 0.222 0.0355 247.14;
+
+    --destructive: 0.645 0.2154 16.44;
+    --destructive-foreground: 0.941 0.0093 247.86;
+
+    --success: 0.789 0.1377 211.53;
+    --warning: 0.82 0.165 85.0;
+
+    --gold: 0.7605 0.1365 84.6;
+
+    --brand-green: 0.5203 0.1089 158.4;
+    --brand-green-light: 0.7562 0.1052 165.5;
+
+    --border: 0.345 0.046 246.2;
+    --input: 0.345 0.046 246.2;
+    --ring: 0.789 0.1377 211.53;
+
+    --chart-1: 0.789 0.1377 211.53;
+    --chart-2: 0.7023 0.0337 246.14;
+    --chart-3: 0.941 0.0093 247.86;
+    --chart-4: 0.2863 0.0435 246.75;
+    --chart-5: 0.645 0.2154 16.44;
+
+    --sidebar: 0.1807 0.0338 249.16;
+    --sidebar-foreground: 0.941 0.0093 247.86;
+    --sidebar-primary: 0.789 0.1377 211.53;
+    --sidebar-primary-foreground: 0.222 0.0355 247.14;
+    --sidebar-accent: 0.2863 0.0435 246.75;
+    --sidebar-accent-foreground: 0.941 0.0093 247.86;
+    --sidebar-border: 0.345 0.046 246.2;
+    --sidebar-ring: 0.789 0.1377 211.53;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-bold uppercase tracking-tight;
+  }
+  h1 {
+    letter-spacing: -0.015em;
+    line-height: 1.02;
+  }
+  h2,
+  h3 {
+    letter-spacing: -0.01em;
+    line-height: 1.08;
+  }
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Slightly raised navy band for alternating sections (#12243A) */
+  .bg-section-alt {
+    background-color: oklch(var(--muted));
+  }
+
+  /* Deep navy page canvas (#0D1B2A) */
+  .bg-canvas {
+    background-color: oklch(var(--background));
+  }
+
+  /* Deeper navy #0A1628 — hero scrim, closing CTA bands, footer */
+  .bg-deep {
+    background-color: oklch(var(--deep-green));
+  }
+
+  /* Bright cyan rule used as an editorial accent. The gradient is sized to a
+     thin 2px band pinned to the bottom edge, so it reads as an underline
+     beneath the label and never paints over the glyphs. Width tracks the
+     element's full text width, so longer labels are never clipped. */
+  .rule-accent {
+    background-image: linear-gradient(
+      to right,
+      oklch(var(--accent)) 0%,
+      oklch(var(--accent)) 100%
+    );
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 100% 2px;
+  }
+
+  /* Thin subtle navy border that never reads as a heavy box */
+  .border-hairline {
+    border: 1px solid oklch(var(--border));
+  }
+
+  /* Fixed top navigation surface — translucent navy over blur */
+  .nav-surface {
+    background-color: oklch(var(--deep-green) / 0.88);
+    backdrop-filter: saturate(160%) blur(12px);
+  }
+
+  /* Deep navy shadows read as depth on dark surfaces */
+  .shadow-subtle {
+    box-shadow: 0 1px 2px 0 oklch(0.12 0.03 249 / 0.5), 0 1px 3px 0
+      oklch(0.12 0.03 249 / 0.4);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 2px 4px -1px oklch(0.12 0.03 249 / 0.55), 0 12px 32px -8px
+      oklch(0.12 0.03 249 / 0.65);
+  }
+
+  .shadow-header {
+    box-shadow: 0 1px 0 0 oklch(var(--border) / 0.7);
+  }
+
+  /* --- Button recipes: apply these classes for a consistent system --- */
+
+  /* Primary: solid cyan fill, dark navy uppercase label */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+      bg-primary px-6 py-3 font-body text-sm font-bold uppercase
+      tracking-[0.12em] text-primary-foreground transition-smooth
+      hover:bg-accent/90 hover:shadow-elevated
+      focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-ring focus-visible:ring-offset-2
+      focus-visible:ring-offset-background;
+  }
+
+  /* Secondary: transparent, cyan outline and cyan uppercase label */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+      border border-primary bg-transparent px-6 py-3 font-body text-sm
+      font-bold uppercase tracking-[0.12em] text-primary transition-smooth
+      hover:bg-primary/10 hover:shadow-subtle
+      focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-ring focus-visible:ring-offset-2
+      focus-visible:ring-offset-background;
+  }
+
+  /* Eyebrow label: uppercase, wide tracking, cyan. Auto-sizes to its full
+     text with padding on both sides so no letter is ever covered or cut off. */
+  .eyebrow {
+    @apply inline-block w-fit max-w-full font-body text-xs font-bold uppercase
+      tracking-[0.2em] text-primary;
+    padding-inline: 0.5rem;
+  }
+}
