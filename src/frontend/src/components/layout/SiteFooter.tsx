@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   FOOTER_COPYRIGHT,
   FOOTER_EMERGENCY_NOTICE,
@@ -23,6 +24,8 @@ const linkClass =
   "rounded text-sm text-foreground/75 transition-smooth hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 export function SiteFooter() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-deep-green text-foreground" data-ocid="footer">
       <div className="container py-16 md:py-20">
@@ -38,10 +41,10 @@ export function SiteFooter() {
               data-ocid="footer.logo"
             />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-foreground/70">
-              {FOOTER_TAGLINE}
+              {t(FOOTER_TAGLINE)}
             </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-foreground/60">
-              {FOOTER_PROVISION}
+              {t(FOOTER_PROVISION)}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button
@@ -49,7 +52,7 @@ export function SiteFooter() {
                 className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
               >
                 <a href={GET_STARTED_URL} data-ocid="footer.get_started_button">
-                  Get Started
+                  {t("Get Started")}
                 </a>
               </Button>
               <Button
@@ -58,7 +61,7 @@ export function SiteFooter() {
                 className="rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary"
               >
                 <a href={SIGN_IN_URL} data-ocid="footer.sign_in_button">
-                  Sign In
+                  {t("Sign In")}
                 </a>
               </Button>
             </div>
@@ -68,11 +71,11 @@ export function SiteFooter() {
           {FOOTER_GROUPS.map((group) => (
             <nav
               key={group.heading}
-              aria-label={group.heading}
+              aria-label={t(group.heading)}
               data-ocid={`footer.group.${toOcid(group.heading)}`}
             >
               <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                {group.heading}
+                {t(group.heading)}
               </h2>
               <ul className="mt-4 space-y-3">
                 {group.items.map((item) => (
@@ -83,7 +86,7 @@ export function SiteFooter() {
                         data-ocid={`footer.link.${toOcid(item.label)}`}
                         className={linkClass}
                       >
-                        {item.label}
+                        {t(item.label)}
                       </Link>
                     ) : (
                       <a
@@ -91,7 +94,7 @@ export function SiteFooter() {
                         data-ocid={`footer.link.${toOcid(item.label)}`}
                         className={linkClass}
                       >
-                        {item.label}
+                        {t(item.label)}
                       </a>
                     )}
                   </li>
@@ -102,12 +105,12 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-14 flex flex-col gap-4 border-t border-border pt-8 text-sm text-foreground/70 md:flex-row md:items-center md:justify-between">
-          <p data-ocid="footer.copyright">{FOOTER_COPYRIGHT}</p>
+          <p data-ocid="footer.copyright">{t(FOOTER_COPYRIGHT)}</p>
           <p
             data-ocid="footer.emergency_notice"
             className="md:max-w-xl md:text-right"
           >
-            {FOOTER_EMERGENCY_NOTICE}
+            {t(FOOTER_EMERGENCY_NOTICE)}
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { ImagePanel } from "@/components/layout/ImagePanel";
 import { Section, SectionHeading } from "@/components/layout/Section";
+import { useTranslation } from "@/i18n/useTranslation";
 import { Check } from "lucide-react";
 
 const GUARANTEES = [
@@ -15,6 +16,8 @@ const GUARANTEES = [
  * the dark navy canvas.
  */
 export function ClinicianControl() {
+  const { t } = useTranslation();
+
   return (
     <Section id="clinician-control">
       <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
@@ -31,7 +34,7 @@ export function ClinicianControl() {
                   <Check aria-hidden="true" className="size-3" />
                 </span>
                 <span className="text-sm leading-relaxed text-foreground/85">
-                  {item}
+                  {t(item)}
                 </span>
               </li>
             ))}

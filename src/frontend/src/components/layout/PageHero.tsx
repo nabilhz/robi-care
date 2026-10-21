@@ -1,4 +1,5 @@
 import { ImagePanel } from "@/components/layout/ImagePanel";
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -26,6 +27,8 @@ export function PageHero({
   children,
   className,
 }: PageHeroProps) {
+  const { t } = useTranslation();
+
   return (
     <section
       className={cn("bg-canvas pb-16 pt-32 md:pb-24 md:pt-40", className)}
@@ -33,12 +36,14 @@ export function PageHero({
       <div className="container">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
           <div className="animate-fade-up">
-            <p className="eyebrow rule-accent inline-block pb-2">{eyebrow}</p>
+            <p className="eyebrow rule-accent inline-block pb-2">
+              {t(eyebrow)}
+            </p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              {title}
+              {t(title)}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              {description}
+              {t(description)}
             </p>
             {children ? <div className="mt-8">{children}</div> : null}
           </div>

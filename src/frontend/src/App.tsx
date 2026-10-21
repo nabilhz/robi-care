@@ -1,6 +1,8 @@
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { AiGovernancePage } from "@/pages/AiGovernancePage";
 import { ContactPage } from "@/pages/ContactPage";
+import { CookieNoticePage } from "@/pages/CookieNoticePage";
+import { HealthcareDisclaimerPage } from "@/pages/HealthcareDisclaimerPage";
 import { HomePage } from "@/pages/HomePage";
 import { KeyboardLiberationPage } from "@/pages/KeyboardLiberationPage";
 import { PartnershipsPage } from "@/pages/PartnershipsPage";
@@ -85,6 +87,18 @@ const sponsorshipRoute = createRoute({
   component: SponsorshipPage,
 });
 
+const healthcareDisclaimerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/healthcare-disclaimer",
+  component: HealthcareDisclaimerPage,
+});
+
+const cookieNoticeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cookie-notice",
+  component: CookieNoticePage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   signUpRoute,
@@ -96,6 +110,8 @@ const routeTree = rootRoute.addChildren([
   sovereignDeploymentRoute,
   partnershipsRoute,
   sponsorshipRoute,
+  healthcareDisclaimerRoute,
+  cookieNoticeRoute,
 ]);
 
 const router = createRouter({ routeTree });

@@ -114,6 +114,1263 @@ reactJsxRuntime_production.jsxs = jsxProd;
   jsxRuntime.exports = reactJsxRuntime_production;
 }
 var jsxRuntimeExports = jsxRuntime.exports;
+var react = { exports: {} };
+var react_production = {};
+/**
+ * @license React
+ * react.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+var REACT_ELEMENT_TYPE$1 = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE$2 = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE$1 = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE$1 = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE$1 = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE$1 = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE$1 = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE$1 = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE$1 = Symbol.for("react.suspense"), REACT_MEMO_TYPE$1 = Symbol.for("react.memo"), REACT_LAZY_TYPE$2 = Symbol.for("react.lazy"), MAYBE_ITERATOR_SYMBOL$1 = Symbol.iterator;
+function getIteratorFn$1(maybeIterable) {
+  if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
+  maybeIterable = MAYBE_ITERATOR_SYMBOL$1 && maybeIterable[MAYBE_ITERATOR_SYMBOL$1] || maybeIterable["@@iterator"];
+  return "function" === typeof maybeIterable ? maybeIterable : null;
+}
+var ReactNoopUpdateQueue = {
+  isMounted: function() {
+    return false;
+  },
+  enqueueForceUpdate: function() {
+  },
+  enqueueReplaceState: function() {
+  },
+  enqueueSetState: function() {
+  }
+}, assign$1 = Object.assign, emptyObject = {};
+function Component(props, context, updater) {
+  this.props = props;
+  this.context = context;
+  this.refs = emptyObject;
+  this.updater = updater || ReactNoopUpdateQueue;
+}
+Component.prototype.isReactComponent = {};
+Component.prototype.setState = function(partialState, callback) {
+  if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
+    throw Error(
+      "takes an object of state variables to update or a function which returns an object of state variables."
+    );
+  this.updater.enqueueSetState(this, partialState, callback, "setState");
+};
+Component.prototype.forceUpdate = function(callback) {
+  this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+};
+function ComponentDummy() {
+}
+ComponentDummy.prototype = Component.prototype;
+function PureComponent(props, context, updater) {
+  this.props = props;
+  this.context = context;
+  this.refs = emptyObject;
+  this.updater = updater || ReactNoopUpdateQueue;
+}
+var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
+pureComponentPrototype.constructor = PureComponent;
+assign$1(pureComponentPrototype, Component.prototype);
+pureComponentPrototype.isPureReactComponent = true;
+var isArrayImpl$1 = Array.isArray, ReactSharedInternals$2 = { H: null, A: null, T: null, S: null, V: null }, hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+function ReactElement(type, key, self2, source, owner, props) {
+  self2 = props.ref;
+  return {
+    $$typeof: REACT_ELEMENT_TYPE$1,
+    type,
+    key,
+    ref: void 0 !== self2 ? self2 : null,
+    props
+  };
+}
+function cloneAndReplaceKey(oldElement, newKey) {
+  return ReactElement(
+    oldElement.type,
+    newKey,
+    void 0,
+    void 0,
+    void 0,
+    oldElement.props
+  );
+}
+function isValidElement(object) {
+  return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE$1;
+}
+function escape(key) {
+  var escaperLookup = { "=": "=0", ":": "=2" };
+  return "$" + key.replace(/[=:]/g, function(match) {
+    return escaperLookup[match];
+  });
+}
+var userProvidedKeyEscapeRegex = /\/+/g;
+function getElementKey(element, index2) {
+  return "object" === typeof element && null !== element && null != element.key ? escape("" + element.key) : index2.toString(36);
+}
+function noop$1$1() {
+}
+function resolveThenable(thenable) {
+  switch (thenable.status) {
+    case "fulfilled":
+      return thenable.value;
+    case "rejected":
+      throw thenable.reason;
+    default:
+      switch ("string" === typeof thenable.status ? thenable.then(noop$1$1, noop$1$1) : (thenable.status = "pending", thenable.then(
+        function(fulfilledValue) {
+          "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+        },
+        function(error) {
+          "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+        }
+      )), thenable.status) {
+        case "fulfilled":
+          return thenable.value;
+        case "rejected":
+          throw thenable.reason;
+      }
+  }
+  throw thenable;
+}
+function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+  var type = typeof children;
+  if ("undefined" === type || "boolean" === type) children = null;
+  var invokeCallback = false;
+  if (null === children) invokeCallback = true;
+  else
+    switch (type) {
+      case "bigint":
+      case "string":
+      case "number":
+        invokeCallback = true;
+        break;
+      case "object":
+        switch (children.$$typeof) {
+          case REACT_ELEMENT_TYPE$1:
+          case REACT_PORTAL_TYPE$2:
+            invokeCallback = true;
+            break;
+          case REACT_LAZY_TYPE$2:
+            return invokeCallback = children._init, mapIntoArray(
+              invokeCallback(children._payload),
+              array,
+              escapedPrefix,
+              nameSoFar,
+              callback
+            );
+        }
+    }
+  if (invokeCallback)
+    return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl$1(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c2) {
+      return c2;
+    })) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(
+      callback,
+      escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(
+        userProvidedKeyEscapeRegex,
+        "$&/"
+      ) + "/") + invokeCallback
+    )), array.push(callback)), 1;
+  invokeCallback = 0;
+  var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
+  if (isArrayImpl$1(children))
+    for (var i = 0; i < children.length; i++)
+      nameSoFar = children[i], type = nextNamePrefix + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
+        nameSoFar,
+        array,
+        escapedPrefix,
+        type,
+        callback
+      );
+  else if (i = getIteratorFn$1(children), "function" === typeof i)
+    for (children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
+      nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
+        nameSoFar,
+        array,
+        escapedPrefix,
+        type,
+        callback
+      );
+  else if ("object" === type) {
+    if ("function" === typeof children.then)
+      return mapIntoArray(
+        resolveThenable(children),
+        array,
+        escapedPrefix,
+        nameSoFar,
+        callback
+      );
+    array = String(children);
+    throw Error(
+      "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+    );
+  }
+  return invokeCallback;
+}
+function mapChildren(children, func, context) {
+  if (null == children) return children;
+  var result = [], count2 = 0;
+  mapIntoArray(children, result, "", "", function(child) {
+    return func.call(context, child, count2++);
+  });
+  return result;
+}
+function lazyInitializer(payload) {
+  if (-1 === payload._status) {
+    var ctor = payload._result;
+    ctor = ctor();
+    ctor.then(
+      function(moduleObject) {
+        if (0 === payload._status || -1 === payload._status)
+          payload._status = 1, payload._result = moduleObject;
+      },
+      function(error) {
+        if (0 === payload._status || -1 === payload._status)
+          payload._status = 2, payload._result = error;
+      }
+    );
+    -1 === payload._status && (payload._status = 0, payload._result = ctor);
+  }
+  if (1 === payload._status) return payload._result.default;
+  throw payload._result;
+}
+var reportGlobalError$1 = "function" === typeof reportError ? reportError : function(error) {
+  if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+    var event = new window.ErrorEvent("error", {
+      bubbles: true,
+      cancelable: true,
+      message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+      error
+    });
+    if (!window.dispatchEvent(event)) return;
+  } else if ("object" === typeof process && "function" === typeof process.emit) {
+    process.emit("uncaughtException", error);
+    return;
+  }
+  console.error(error);
+};
+function noop$6() {
+}
+react_production.Children = {
+  map: mapChildren,
+  forEach: function(children, forEachFunc, forEachContext) {
+    mapChildren(
+      children,
+      function() {
+        forEachFunc.apply(this, arguments);
+      },
+      forEachContext
+    );
+  },
+  count: function(children) {
+    var n = 0;
+    mapChildren(children, function() {
+      n++;
+    });
+    return n;
+  },
+  toArray: function(children) {
+    return mapChildren(children, function(child) {
+      return child;
+    }) || [];
+  },
+  only: function(children) {
+    if (!isValidElement(children))
+      throw Error(
+        "React.Children.only expected to receive a single React element child."
+      );
+    return children;
+  }
+};
+react_production.Component = Component;
+react_production.Fragment = REACT_FRAGMENT_TYPE$1;
+react_production.Profiler = REACT_PROFILER_TYPE$1;
+react_production.PureComponent = PureComponent;
+react_production.StrictMode = REACT_STRICT_MODE_TYPE$1;
+react_production.Suspense = REACT_SUSPENSE_TYPE$1;
+react_production.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals$2;
+react_production.__COMPILER_RUNTIME = {
+  __proto__: null,
+  c: function(size) {
+    return ReactSharedInternals$2.H.useMemoCache(size);
+  }
+};
+react_production.cache = function(fn) {
+  return function() {
+    return fn.apply(null, arguments);
+  };
+};
+react_production.cloneElement = function(element, config, children) {
+  if (null === element || void 0 === element)
+    throw Error(
+      "The argument must be a React element, but you passed " + element + "."
+    );
+  var props = assign$1({}, element.props), key = element.key, owner = void 0;
+  if (null != config)
+    for (propName in void 0 !== config.ref && (owner = void 0), void 0 !== config.key && (key = "" + config.key), config)
+      !hasOwnProperty$1.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+  var propName = arguments.length - 2;
+  if (1 === propName) props.children = children;
+  else if (1 < propName) {
+    for (var childArray = Array(propName), i = 0; i < propName; i++)
+      childArray[i] = arguments[i + 2];
+    props.children = childArray;
+  }
+  return ReactElement(element.type, key, void 0, void 0, owner, props);
+};
+react_production.createContext = function(defaultValue) {
+  defaultValue = {
+    $$typeof: REACT_CONTEXT_TYPE$1,
+    _currentValue: defaultValue,
+    _currentValue2: defaultValue,
+    _threadCount: 0,
+    Provider: null,
+    Consumer: null
+  };
+  defaultValue.Provider = defaultValue;
+  defaultValue.Consumer = {
+    $$typeof: REACT_CONSUMER_TYPE$1,
+    _context: defaultValue
+  };
+  return defaultValue;
+};
+react_production.createElement = function(type, config, children) {
+  var propName, props = {}, key = null;
+  if (null != config)
+    for (propName in void 0 !== config.key && (key = "" + config.key), config)
+      hasOwnProperty$1.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
+  var childrenLength = arguments.length - 2;
+  if (1 === childrenLength) props.children = children;
+  else if (1 < childrenLength) {
+    for (var childArray = Array(childrenLength), i = 0; i < childrenLength; i++)
+      childArray[i] = arguments[i + 2];
+    props.children = childArray;
+  }
+  if (type && type.defaultProps)
+    for (propName in childrenLength = type.defaultProps, childrenLength)
+      void 0 === props[propName] && (props[propName] = childrenLength[propName]);
+  return ReactElement(type, key, void 0, void 0, null, props);
+};
+react_production.createRef = function() {
+  return { current: null };
+};
+react_production.forwardRef = function(render) {
+  return { $$typeof: REACT_FORWARD_REF_TYPE$1, render };
+};
+react_production.isValidElement = isValidElement;
+react_production.lazy = function(ctor) {
+  return {
+    $$typeof: REACT_LAZY_TYPE$2,
+    _payload: { _status: -1, _result: ctor },
+    _init: lazyInitializer
+  };
+};
+react_production.memo = function(type, compare2) {
+  return {
+    $$typeof: REACT_MEMO_TYPE$1,
+    type,
+    compare: void 0 === compare2 ? null : compare2
+  };
+};
+react_production.startTransition = function(scope) {
+  var prevTransition = ReactSharedInternals$2.T, currentTransition = {};
+  ReactSharedInternals$2.T = currentTransition;
+  try {
+    var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals$2.S;
+    null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+    "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop$6, reportGlobalError$1);
+  } catch (error) {
+    reportGlobalError$1(error);
+  } finally {
+    ReactSharedInternals$2.T = prevTransition;
+  }
+};
+react_production.unstable_useCacheRefresh = function() {
+  return ReactSharedInternals$2.H.useCacheRefresh();
+};
+react_production.use = function(usable) {
+  return ReactSharedInternals$2.H.use(usable);
+};
+react_production.useActionState = function(action, initialState, permalink) {
+  return ReactSharedInternals$2.H.useActionState(action, initialState, permalink);
+};
+react_production.useCallback = function(callback, deps) {
+  return ReactSharedInternals$2.H.useCallback(callback, deps);
+};
+react_production.useContext = function(Context) {
+  return ReactSharedInternals$2.H.useContext(Context);
+};
+react_production.useDebugValue = function() {
+};
+react_production.useDeferredValue = function(value, initialValue) {
+  return ReactSharedInternals$2.H.useDeferredValue(value, initialValue);
+};
+react_production.useEffect = function(create, createDeps, update) {
+  var dispatcher = ReactSharedInternals$2.H;
+  if ("function" === typeof update)
+    throw Error(
+      "useEffect CRUD overload is not enabled in this build of React."
+    );
+  return dispatcher.useEffect(create, createDeps);
+};
+react_production.useId = function() {
+  return ReactSharedInternals$2.H.useId();
+};
+react_production.useImperativeHandle = function(ref, create, deps) {
+  return ReactSharedInternals$2.H.useImperativeHandle(ref, create, deps);
+};
+react_production.useInsertionEffect = function(create, deps) {
+  return ReactSharedInternals$2.H.useInsertionEffect(create, deps);
+};
+react_production.useLayoutEffect = function(create, deps) {
+  return ReactSharedInternals$2.H.useLayoutEffect(create, deps);
+};
+react_production.useMemo = function(create, deps) {
+  return ReactSharedInternals$2.H.useMemo(create, deps);
+};
+react_production.useOptimistic = function(passthrough, reducer) {
+  return ReactSharedInternals$2.H.useOptimistic(passthrough, reducer);
+};
+react_production.useReducer = function(reducer, initialArg, init) {
+  return ReactSharedInternals$2.H.useReducer(reducer, initialArg, init);
+};
+react_production.useRef = function(initialValue) {
+  return ReactSharedInternals$2.H.useRef(initialValue);
+};
+react_production.useState = function(initialState) {
+  return ReactSharedInternals$2.H.useState(initialState);
+};
+react_production.useSyncExternalStore = function(subscribe2, getSnapshot, getServerSnapshot) {
+  return ReactSharedInternals$2.H.useSyncExternalStore(
+    subscribe2,
+    getSnapshot,
+    getServerSnapshot
+  );
+};
+react_production.useTransition = function() {
+  return ReactSharedInternals$2.H.useTransition();
+};
+react_production.version = "19.1.5";
+{
+  react.exports = react_production;
+}
+var reactExports = react.exports;
+const React$4 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
+const React$5 = /* @__PURE__ */ _mergeNamespaces({
+  __proto__: null,
+  default: React$4
+}, [reactExports]);
+const DEFAULT_LANGUAGE = "en";
+const LANGUAGE_STORAGE_KEY = "robi-care-language";
+const LANGUAGES = [
+  { code: "en", label: "English", shortLabel: "EN" },
+  { code: "fr", label: "Français", shortLabel: "FR" }
+];
+const PAGE_TITLE = {
+  en: "Robi Care — Clinical Documentation & Communication Platform",
+  fr: "Robi Care — Plateforme de documentation et de communication cliniques"
+};
+const FRENCH = {
+  // Header
+  "AI-assisted · Clinician-controlled · Designed for sovereign deployment": "Assisté par IA · Contrôlé par le clinicien · Conçu pour un déploiement souverain",
+  "Account demo": "Démo du compte",
+  "Sign Up": "S'inscrire",
+  "Open navigation menu": "Ouvrir le menu de navigation",
+  "Close navigation menu": "Fermer le menu de navigation",
+  Primary: "Principale",
+  Mobile: "Mobile",
+  Language: "Langue",
+  "Robi Care home": "Accueil Robi Care",
+  // Primary navigation
+  Solutions: "Solutions",
+  "AI Governance": "Gouvernance de l'IA",
+  "Sovereign AI": "IA souveraine",
+  Pricing: "Tarifs",
+  // Footer
+  "Governed clinical enablement for more human care.": "Une assistance clinique gouvernée pour des soins plus humains.",
+  "A service provision of Ecocarrier Inc., Ontario, Canada.": "Un service fourni par Ecocarrier Inc., Ontario, Canada.",
+  "© 2026 Ecocarrier Inc. All rights reserved.": "© 2026 Ecocarrier Inc. Tous droits réservés.",
+  "Not an emergency service. In an emergency, contact the applicable local emergency service.": "Service non destiné aux urgences. En cas d'urgence, contactez le service d'urgence local compétent.",
+  Explore: "Explorer",
+  Deploy: "Déployer",
+  "Contact & policies": "Contact et politiques",
+  "Clinical solutions": "Solutions cliniques",
+  "AI governance": "Gouvernance de l'IA",
+  Sponsorship: "Parrainage",
+  "PPP partnerships": "Partenariats PPP",
+  Onboarding: "Intégration",
+  "Account demonstration": "Démonstration du compte",
+  Contact: "Contact",
+  Privacy: "Confidentialité",
+  "Terms of Use": "Conditions d'utilisation",
+  "Clinical disclaimer": "Avertissement clinique",
+  // Shared calls to action
+  "Get started": "Commencer",
+  "Get Started": "Commencer",
+  "Sign In": "Se connecter",
+  "Contact us": "Nous contacter",
+  "Talk to the team": "Parler à l'équipe",
+  "Become a Sponsor": "Devenir parrain",
+  "View pricing": "Voir les tarifs",
+  "Deployment model": "Modèle de déploiement",
+  "Contact for partnership": "Contacter pour un partenariat",
+  "Send enquiry": "Envoyer la demande",
+  "Send another enquiry": "Envoyer une autre demande",
+  Continue: "Continuer",
+  Verify: "Vérifier",
+  "Back to details": "Retour aux informations",
+  "Start over": "Recommencer",
+  "Return home": "Retour à l'accueil",
+  // Home — hero
+  "GOVERNED CLINICAL AI": "IA CLINIQUE GOUVERNÉE",
+  "More presence. Less paperwork.": "Plus de présence. Moins de paperasse.",
+  "Robi Care helps healthcare professionals capture, structure and review clinical information—while keeping qualified clinicians in control of patient-care decisions.": "Robi Care aide les professionnels de santé à recueillir, structurer et vérifier les informations cliniques, tout en laissant les cliniciens qualifiés maîtres des décisions de soins aux patients.",
+  "Explore clinical solutions": "Découvrir les solutions cliniques",
+  // Home — audience section
+  "Who we support": "Qui nous accompagnons",
+  "Built for the teams who carry the clinical load": "Conçu pour les équipes qui portent la charge clinique",
+  "Robi Care adapts to the documentation reality of each care setting, from the consultation room to the field.": "Robi Care s'adapte à la réalité documentaire de chaque environnement de soins, du cabinet de consultation au terrain.",
+  "Physicians and Medical Personnel": "Médecins et personnel médical",
+  "Spend less time on documentation, more time with patients.": "Passez moins de temps sur la documentation, plus de temps auprès des patients.",
+  "Nursing Teams": "Équipes soignantes",
+  "Capture structured observations, handovers and workflow information.": "Recueillez des observations structurées, des transmissions et des informations de flux de travail.",
+  "Emergency Departments": "Services d'urgence",
+  "Support rapid documentation, multilingual intake and accountable escalation.": "Facilitez une documentation rapide, l'accueil multilingue et une escalade traçable.",
+  "EMS Organizations": "Organisations de services médicaux d'urgence",
+  "Capture field information and prepare structured handover records.": "Recueillez les informations de terrain et préparez des dossiers de transmission structurés.",
+  "Clinics and Hospital Administrators": "Directions de cliniques et d'hôpitaux",
+  "Improve workflow consistency, visibility, governance and cost accountability.": "Améliorez la cohérence des flux de travail, la visibilité, la gouvernance et la responsabilité des coûts.",
+  "AI-assisted, clinician-controlled. Robi Care prepares information for professional review; it does not replace clinical judgment.": "Assisté par IA, contrôlé par le clinicien. Robi Care prépare l'information pour un examen professionnel ; il ne remplace pas le jugement clinique.",
+  // Home — how it works
+  "From consultation to clear documentation in three steps": "De la consultation à une documentation claire en trois étapes",
+  "Robi Care supports the clinical encounter end to end, while every decision stays with the clinician.": "Robi Care accompagne la rencontre clinique de bout en bout, chaque décision restant entre les mains du clinicien.",
+  "Capture the conversation": "Recueillir la conversation",
+  "Robi Care listens alongside the clinician during a consultation, turning spoken dialogue into a clean, timestamped transcript without interrupting the visit.": "Robi Care écoute aux côtés du clinicien pendant la consultation et transforme le dialogue parlé en une transcription horodatée et claire, sans interrompre la visite.",
+  "Prepare structured documentation": "Préparer une documentation structurée",
+  "The transcript is organised into the clinical note structure your team already uses — history, findings, assessment, and plan — ready for review in seconds.": "La transcription est organisée selon la structure de note clinique que votre équipe utilise déjà — antécédents, observations, évaluation et plan — prête à être vérifiée en quelques secondes.",
+  "Coordinate follow-up": "Coordonner le suivi",
+  "Referrals, recalls, and next appointments are surfaced as clear actions so nothing falls through the gaps between visits.": "Les orientations, les rappels et les prochains rendez-vous apparaissent sous forme d'actions claires, afin que rien ne se perde entre les visites.",
+  // Home — clinician control
+  "Clinician in control": "Le clinicien aux commandes",
+  "The clinician reviews and approves every output": "Le clinicien vérifie et approuve chaque résultat",
+  "Robi Care is an assistant, not an author. It prepares the work, and the clinician decides what becomes part of the record.": "Robi Care est un assistant, non un auteur. Il prépare le travail, et le clinicien décide de ce qui intègre le dossier.",
+  "Every generated note is a draft until a clinician reviews and approves it.": "Chaque note générée reste un brouillon tant qu'un clinicien ne l'a pas vérifiée et approuvée.",
+  "Nothing is written to the patient record without an explicit human action.": "Rien n'est écrit dans le dossier du patient sans une action humaine explicite.",
+  "Suggested content is always traceable back to the source conversation.": "Le contenu suggéré est toujours traçable jusqu'à la conversation source.",
+  "Clinicians can edit, reject, or rewrite any part of the output.": "Les cliniciens peuvent modifier, rejeter ou réécrire toute partie du résultat.",
+  "Draft notes are presented for review — the clinician approves, edits, or discards each one before it is used.": "Les notes en brouillon sont présentées pour vérification — le clinicien approuve, modifie ou écarte chacune d'elles avant son utilisation.",
+  // Home — platform provenance
+  "Platform provenance": "Provenance de la plateforme",
+  "Built on the TMU Enablement Platform": "Construit sur la TMU Enablement Platform",
+  "Robi Care is a clinical application of the TMU · TeleMeetUp Enablement Platform — the same engine behind Morshid.": "Robi Care est une application clinique de la TMU · TeleMeetUp Enablement Platform — le même moteur que celui de Morshid.",
+  "Shared enablement engine": "Moteur d'assistance partagé",
+  "Robi Care runs on the same TMU Enablement Platform that powers Morshid, so capabilities, integrations, and governance are maintained in one place.": "Robi Care s'exécute sur la même TMU Enablement Platform que celle qui alimente Morshid, de sorte que les capacités, les intégrations et la gouvernance sont maintenues en un seul endroit.",
+  "Consistent governance": "Gouvernance cohérente",
+  "Access control, audit trails, and data handling follow the platform's established policies rather than a one-off clinical tool.": "Le contrôle d'accès, les pistes d'audit et le traitement des données suivent les politiques établies de la plateforme plutôt que celles d'un outil clinique isolé.",
+  "Built for clinical workflows": "Conçu pour les flux de travail cliniques",
+  "The platform layer handles capture, structuring, and coordination so clinical teams can focus on the patient in front of them.": "La couche plateforme prend en charge la saisie, la structuration et la coordination, afin que les équipes cliniques puissent se concentrer sur le patient qui leur fait face.",
+  "Powered by TMU · TeleMeetUp Enablement Platform.": "Propulsé par TMU · TeleMeetUp Enablement Platform.",
+  // Home — closing call to action
+  "Bring calm documentation to your clinic": "Apportez une documentation sereine à votre clinique",
+  "Start with Robi Care on the TMU · TeleMeetUp Enablement Platform, or talk to us about how it fits your clinical workflow.": "Commencez avec Robi Care sur la TMU · TeleMeetUp Enablement Platform, ou parlez-nous de son intégration à votre flux de travail clinique.",
+  // Solutions page — hero and section headings
+  "Clinical use cases, handled with care": "Des cas d'usage cliniques, traités avec soin",
+  "Robi Care supports three parts of the clinical encounter: capturing the conversation, preparing structured documentation, and coordinating what happens next.": "Robi Care accompagne trois étapes de la consultation clinique : la capture de la conversation, la préparation d'une documentation structurée et la coordination de la suite.",
+  "Each solution is designed to sit inside existing clinical workflows, not replace them.": "Chaque solution est conçue pour s'intégrer aux flux de travail cliniques existants, sans les remplacer.",
+  "Use cases": "Cas d'usage",
+  "Where Robi Care helps most": "Là où Robi Care apporte le plus",
+  "Three connected capabilities that reduce documentation load while keeping clinical judgement with the clinician.": "Trois capacités connectées qui allègent la charge de documentation tout en laissant le jugement clinique au clinicien.",
+  "Workflow fit": "Adéquation au flux de travail",
+  "It fits the workflow you already have": "Il s'intègre au flux de travail que vous utilisez déjà",
+  "Robi Care does not ask your team to change how they practise. It removes the documentation burden around the consultation and leaves clinical judgement exactly where it belongs.": "Robi Care ne demande pas à votre équipe de changer sa pratique. Il allège la charge de documentation autour de la consultation et laisse le jugement clinique exactement là où il doit être.",
+  "No new clinical process": "Aucun nouveau processus clinique",
+  "The consultation stays a conversation. Robi Care works in the background and presents its output for review afterwards.": "La consultation reste une conversation. Robi Care travaille en arrière-plan et présente son résultat pour relecture ensuite.",
+  "Judgement stays clinical": "Le jugement reste clinique",
+  "Suggestions are drafts. The clinician decides what is accurate, what is relevant, and what belongs in the record.": "Les suggestions sont des brouillons. Le clinicien décide de ce qui est exact, de ce qui est pertinent et de ce qui doit figurer au dossier.",
+  "One platform underneath": "Une seule plateforme en arrière-plan",
+  "Robi Care runs on the TMU · TeleMeetUp Enablement Platform, so governance and integrations are shared rather than duplicated.": "Robi Care s'exécute sur la TMU · TeleMeetUp Enablement Platform, de sorte que la gouvernance et les intégrations sont mutualisées plutôt que dupliquées.",
+  "Who it is for": "À qui il s'adresse",
+  "Built for the teams who document care": "Conçu pour les équipes qui documentent les soins",
+  "Seven audiences use Robi Care in different settings. In every case the clinician stays in control, and every record is reviewed by a person before it is finalized.": "Sept publics utilisent Robi Care dans des contextes différents. Dans tous les cas, le clinicien garde la maîtrise et chaque dossier est relu par une personne avant d'être finalisé.",
+  "Next step": "Prochaine étape",
+  "See how Robi Care fits your clinic": "Découvrez comment Robi Care s'intègre à votre clinique",
+  "Talk to the team about your documentation workflow, or get started on the platform today.": "Parlez à l'équipe de votre flux de documentation, ou commencez dès aujourd'hui sur la plateforme.",
+  "Documentation that supports clinical care": "Une documentation au service des soins cliniques",
+  "Bring Robi Care into your clinic and keep the clinician in control of every note.": "Adoptez Robi Care dans votre clinique et laissez le clinicien maîtriser chaque note.",
+  // Solutions page — use-case cards
+  "Conversation capture": "Capture de la conversation",
+  "Turn the spoken consultation into an accurate, timestamped transcript without asking the clinician to type or dictate.": "Transformez la consultation parlée en une transcription horodatée et fidèle, sans demander au clinicien de saisir ou de dicter.",
+  "Runs alongside the visit rather than replacing it": "Fonctionne en parallèle de la consultation plutôt que de la remplacer",
+  "Speaker-aware transcript for clear attribution": "Transcription distinguant les locuteurs pour une attribution claire",
+  "Works for in-room and remote consultations": "Fonctionne pour les consultations en présentiel et à distance",
+  "Structured documentation": "Documentation structurée",
+  "Organise the transcript into the note structure your team already uses, so documentation is ready for review in seconds.": "Organisez la transcription selon la structure de note que votre équipe utilise déjà, pour une documentation prête à être relue en quelques secondes.",
+  "History, findings, assessment, and plan sections": "Sections antécédents, observations, évaluation et plan",
+  "Draft notes that stay editable until approved": "Des notes brouillons qui restent modifiables jusqu'à leur approbation",
+  "Consistent structure across the whole clinical team": "Une structure cohérente pour toute l'équipe clinique",
+  "Follow-up coordination": "Coordination du suivi",
+  "Surface referrals, recalls, and next appointments as clear actions so nothing slips between visits.": "Faites apparaître les orientations, les rappels et les prochains rendez-vous comme des actions claires, pour que rien ne passe entre les visites.",
+  "Action list generated from the consultation": "Liste d'actions générée à partir de la consultation",
+  "Referrals and recalls captured in one place": "Orientations et rappels regroupés au même endroit",
+  "Clear ownership for every follow-up step": "Une responsabilité claire pour chaque étape du suivi",
+  // Solutions page — audience detail labels
+  "The challenge": "Le défi",
+  "How Robi Care helps": "Comment Robi Care aide",
+  "Where human review occurs": "Où intervient la relecture humaine",
+  // Solutions page — audiences
+  "Manual charting eats into the time available for patients, and the note is often written after the consultation has ended.": "La tenue manuelle du dossier empiète sur le temps disponible pour les patients, et la note est souvent rédigée après la fin de la consultation.",
+  "Robi Care captures the consultation with consent and prepares a structured draft note, working alongside existing EMR and EHR systems.": "Robi Care capture la consultation avec le consentement du patient et prépare une note brouillon structurée, en complément des systèmes EMR et EHR existants.",
+  "The physician reviews, corrects and signs every note before it is finalized.": "Le médecin relit, corrige et signe chaque note avant sa finalisation.",
+  "Documentation support that keeps clinical teams talking to each other, not to a screen.": "Une assistance documentaire qui aide les équipes cliniques à se parler entre elles, plutôt qu'à un écran.",
+  "Nursing and Allied Health": "Soins infirmiers et professions paramédicales",
+  "Handovers and observations are time-consuming to document consistently across shifts and teams.": "Les transmissions et les observations demandent beaucoup de temps pour être documentées de manière cohérente d'une équipe et d'un service à l'autre.",
+  "Robi Care captures structured observations and shift handovers so the record reflects what was actually said and seen.": "Robi Care capture les observations structurées et les transmissions de service, afin que le dossier reflète ce qui a réellement été dit et observé.",
+  "The nurse or allied health professional reviews and approves before the record is used.": "L'infirmier ou le professionnel paramédical relit et approuve avant que le dossier ne soit utilisé.",
+  "Walk-In and Family-Medicine Clinics": "Cliniques sans rendez-vous et de médecine de famille",
+  "High patient volume leaves little time for documentation between appointments.": "Un volume élevé de patients laisse peu de temps pour la documentation entre les rendez-vous.",
+  "Robi Care streamlines intake and consultation notes, speech-enabled in the clinician's spoken language.": "Robi Care simplifie l'accueil et les notes de consultation, avec la reconnaissance vocale dans la langue parlée par le clinicien.",
+  "The clinician approves every note before it enters the patient record.": "Le clinicien approuve chaque note avant son intégration au dossier du patient.",
+  "Hospital Emergency Departments": "Services d'urgence hospitaliers",
+  "Fast-moving, high-acuity cases require rapid, accurate documentation under pressure.": "Les cas évolutifs et de haute acuité exigent une documentation rapide et précise sous pression.",
+  "Robi Care supports rapid, multilingual documentation and intake during triage and treatment.": "Robi Care prend en charge une documentation et un accueil rapides et multilingues pendant le triage et le traitement.",
+  "The attending clinician reviews and authorizes records, with accountable escalation paths.": "Le clinicien responsable relit et autorise les dossiers, avec des voies d'escalade clairement établies.",
+  "EMS Providers": "Intervenants des services médicaux d'urgence",
+  "Field documentation is difficult to capture accurately in real time while care is being delivered.": "La documentation sur le terrain est difficile à saisir avec exactitude en temps réel pendant la prise en charge.",
+  "Robi Care captures field information and prepares structured handover records for receiving hospitals.": "Robi Care capture les informations de terrain et prépare des dossiers de transmission structurés pour les hôpitaux receveurs.",
+  "EMS personnel and receiving clinicians review before handover records are finalized.": "Le personnel des services médicaux d'urgence et les cliniciens receveurs relisent avant la finalisation des dossiers de transmission.",
+  "Field information captured in the moment, reviewed by both teams before it is finalized.": "Des informations de terrain recueillies sur le moment, relues par les deux équipes avant leur finalisation.",
+  "Hospital Administrators": "Administrateurs hospitaliers",
+  "Limited visibility into documentation workload, cost and governance across departments.": "Une visibilité limitée sur la charge de documentation, les coûts et la gouvernance entre les services.",
+  "Robi Care provides workflow consistency, visibility and cost accountability across the institution, with administrative and clinical governance oversight retained throughout.": "Robi Care assure la cohérence des flux de travail, la visibilité et la responsabilité des coûts à l'échelle de l'établissement, tout en maintenant la supervision administrative et la gouvernance clinique.",
+  "Administrative and clinical governance oversight is retained throughout.": "La supervision administrative et la gouvernance clinique sont maintenues tout au long du processus.",
+  "Government and Public-Health Programs": "Programmes gouvernementaux et de santé publique",
+  "Extending consistent clinical documentation support across public health systems is resource-intensive.": "Étendre un soutien cohérent à la documentation clinique à l'ensemble des systèmes de santé publique mobilise d'importantes ressources.",
+  "Robi Care is available through Public-Private Partnerships for national or regional programs, deployed in-country via the SAAAS Platform.": "Robi Care est disponible via des partenariats public-privé pour les programmes nationaux ou régionaux, déployé dans le pays via la SAAAS Platform.",
+  "Clinical governance remains with local healthcare institutions.": "La gouvernance clinique reste confiée aux institutions de santé locales.",
+  // AI Governance — hero
+  "Clinical AI that can be constrained, examined and stopped.": "Une IA clinique que l'on peut encadrer, examiner et arrêter.",
+  "Robi Care is built around a single rule: AI prepares, clinicians decide. Every generated note is a draft until a clinician reviews and approves it — and that review is part of the workflow, not an optional step.": "Robi Care repose sur une règle unique : l'IA prépare, le clinicien décide. Chaque note générée reste un brouillon tant qu'un clinicien ne l'a pas vérifiée et approuvée — et cette vérification fait partie du flux de travail, elle n'est pas une étape facultative.",
+  "Review-before-use is the default. The clinician reads the draft, corrects it, and approves it before anything is filed.": "La vérification avant utilisation est le comportement par défaut. Le clinicien lit le brouillon, le corrige et l'approuve avant tout classement.",
+  // AI Governance — opening section
+  "HUMAN AUTHORITY BY DESIGN": "L'AUTORITÉ HUMAINE PAR CONCEPTION",
+  "Robi Care combines clinical workflow support with policy gates, human authorization and traceable evidence through SSOT-AI-GOV.": "Robi Care associe l'assistance au flux de travail clinique à des contrôles de politique, une autorisation humaine et des preuves traçables via SSOT-AI-GOV.",
+  "See the governance architecture": "Voir l'architecture de gouvernance",
+  "Fail-closed": "Refus par défaut",
+  "Restricted actions are denied when authorization, required evidence or governance services are unavailable.": "Les actions restreintes sont refusées lorsque l'autorisation, les preuves requises ou les services de gouvernance sont indisponibles.",
+  "Draft clinical content remains visibly unapproved until an authorized professional signs off.": "Le contenu clinique en brouillon reste visiblement non approuvé tant qu'un professionnel autorisé ne l'a pas validé.",
+  // AI Governance — section eyebrows
+  "Governance principles": "Principes de gouvernance",
+  Architecture: "Architecture",
+  Questions: "Questions",
+  "Data handling": "Traitement des données",
+  // AI Governance — four commitments
+  "Four commitments that shape how the system behaves": "Quatre engagements qui déterminent le comportement du système",
+  "These are workflow commitments, not marketing claims. Each one describes something the product does — or deliberately refuses to do.": "Ce sont des engagements de flux de travail, non des arguments marketing. Chacun décrit ce que le produit fait — ou refuse délibérément de faire.",
+  "Clinician oversight": "Supervision par le clinicien",
+  "A qualified clinician owns every clinical decision. Robi Care prepares material for that decision; it never makes the decision.": "Un clinicien qualifié est responsable de chaque décision clinique. Robi Care prépare les éléments de cette décision ; il ne prend jamais la décision.",
+  "Review before use": "Vérification avant utilisation",
+  "Generated output is a draft. It is read, corrected, and approved by a clinician before it enters the patient record.": "Le résultat généré est un brouillon. Il est lu, corrigé et approuvé par un clinicien avant d'intégrer le dossier du patient.",
+  "Transparency of output": "Transparence du résultat",
+  "Clinicians can see what was captured and what was generated, so the basis of every note is visible rather than assumed.": "Les cliniciens voient ce qui a été recueilli et ce qui a été généré, de sorte que le fondement de chaque note est visible plutôt que supposé.",
+  "Deliberate data handling": "Traitement délibéré des données",
+  "Patient information is handled only for the purpose of preparing the note, under the clinic's own policies and controls.": "Les informations du patient ne sont traitées que dans le but de préparer la note, selon les politiques et les contrôles propres à la clinique.",
+  // AI Governance — eight principles
+  "The rules the system is held to": "Les règles auxquelles le système est tenu",
+  "Eight principles define what the platform checks before it acts, what it refuses to do by default, and what it records afterwards.": "Huit principes définissent ce que la plateforme vérifie avant d'agir, ce qu'elle refuse de faire par défaut et ce qu'elle consigne ensuite.",
+  "AI actions begin with explicit identity, role and authorization checks": "Les actions de l'IA commencent par des contrôles explicites d'identité, de rôle et d'autorisation",
+  "Applicable policies are evaluated before any action proceeds": "Les politiques applicables sont évaluées avant que toute action ne se poursuive",
+  "Restricted actions are denied by default when authorization or information is missing": "Les actions restreintes sont refusées par défaut lorsque l'autorisation ou l'information fait défaut",
+  "Higher-risk outputs require human approval": "Les résultats à risque plus élevé exigent une approbation humaine",
+  "Material actions generate time-stamped evidence and governance receipts": "Les actions importantes génèrent des preuves horodatées et des reçus de gouvernance",
+  "Administrators can suspend workflows, models, integrations or user privileges": "Les administrateurs peuvent suspendre des flux de travail, des modèles, des intégrations ou des privilèges d'utilisateur",
+  "Incidents can be reconstructed from protected records": "Les incidents peuvent être reconstitués à partir de dossiers protégés",
+  "Model confidence never overrides an applicable clinical or organizational rule": "La confiance du modèle ne prime jamais sur une règle clinique ou organisationnelle applicable",
+  // AI Governance — architecture section
+  "How a request is governed end to end": "Comment une requête est gouvernée de bout en bout",
+  "Every request passes through identity and policy gates before it reaches a workflow service or the evidence ledger, and no output reaches a record without clinician review.": "Chaque requête franchit des contrôles d'identité et de politique avant d'atteindre un service de flux de travail ou le registre de preuves, et aucun résultat n'atteint un dossier sans la vérification d'un clinicien.",
+  "Fail-safe and fail-closed are design objectives subject to testing, validation and contractual scope — not a guarantee that failure or harm is impossible.": "La sécurité intégrée et le refus par défaut sont des objectifs de conception soumis aux tests, à la validation et au périmètre contractuel — et non la garantie qu'une défaillance ou un préjudice est impossible.",
+  // AI Governance — architecture diagram
+  "Governance architecture": "Architecture de gouvernance",
+  "How a request moves from a care team member to a signed clinical record, and where identity, policy, evidence and human review sit in that path.": "Comment une requête passe d'un membre de l'équipe de soins à un dossier clinique signé, et où se situent l'identité, la politique, les preuves et la vérification humaine dans ce parcours.",
+  "Clinician/Nurse/EMS/Administrator": "Clinicien/Infirmier/EMS/Administrateur",
+  "Identity, Consent and Role Controls": "Contrôles d'identité, de consentement et de rôle",
+  "SSOT-AI-GOV Policy Gates": "Contrôles de politique SSOT-AI-GOV",
+  "parallel branches": "branches parallèles",
+  "TMU Clinical Workflow Services": "Services de flux de travail clinique TMU",
+  "Evidence Ledger and Audit Receipts": "Registre de preuves et reçus d'audit",
+  converge: "convergence",
+  "Approved AI Models and Clinical/Administrative Systems": "Modèles d'IA approuvés et systèmes cliniques/administratifs",
+  "Clinician Review and Sign-off": "Vérification et validation par le clinicien",
+  // AI Governance — oversight in practice
+  "Oversight in practice": "La supervision en pratique",
+  "Governance that can be inspected, not just asserted": "Une gouvernance que l'on peut inspecter, pas seulement affirmer",
+  "Controls are only meaningful if someone can see them working. Administrators and compliance officers review how policies were applied, where actions were denied, and what evidence was produced.": "Les contrôles n'ont de sens que si quelqu'un peut les voir à l'œuvre. Les administrateurs et les responsables de la conformité examinent comment les politiques ont été appliquées, où des actions ont été refusées et quelles preuves ont été produites.",
+  "Policy outcomes are visible": "Les résultats des politiques sont visibles",
+  "Each decision shows which policy applied and whether the action proceeded, required approval, or was denied.": "Chaque décision indique quelle politique s'est appliquée et si l'action s'est poursuivie, a nécessité une approbation ou a été refusée.",
+  "Exceptions are reviewable": "Les exceptions sont vérifiables",
+  "Denials and approval requests are surfaced for review rather than silently dropped.": "Les refus et les demandes d'approbation sont présentés pour vérification plutôt que silencieusement écartés.",
+  "Controls can be suspended": "Les contrôles peuvent être suspendus",
+  "Administrators can stop workflows, models, integrations or user privileges when oversight requires it.": "Les administrateurs peuvent arrêter des flux de travail, des modèles, des intégrations ou des privilèges d'utilisateur lorsque la supervision l'exige.",
+  "Governance is observable in practice: administrators and compliance officers review policy outcomes, evidence and exceptions on an ongoing basis.": "La gouvernance est observable en pratique : les administrateurs et les responsables de la conformité examinent en continu les résultats des politiques, les preuves et les exceptions.",
+  // AI Governance — human in the loop
+  "Human in the loop": "L'humain dans la boucle",
+  "Decision control stays with the clinician": "Le contrôle des décisions reste au clinicien",
+  "Automation is confined to the parts of documentation that do not require judgement. Everything that does require judgement is left where it belongs.": "L'automatisation se limite aux parties de la documentation qui n'exigent pas de jugement. Tout ce qui exige un jugement reste là où il doit être.",
+  "The system drafts, the clinician decides": "Le système rédige, le clinicien décide",
+  "Robi Care organises what was said into a structured note. It does not diagnose, prescribe, or act.": "Robi Care organise ce qui a été dit en une note structurée. Il ne pose pas de diagnostic, ne prescrit pas et n'agit pas.",
+  "Approval is the gate to the record": "L'approbation est la porte d'accès au dossier",
+  "Nothing generated reaches the patient record without a clinician's explicit approval.": "Rien de ce qui est généré n'atteint le dossier du patient sans l'approbation explicite d'un clinicien.",
+  "Corrections are first-class": "Les corrections sont pleinement prises en compte",
+  "Editing a draft is a normal part of the workflow, not a failure state. The clinician's version is the note.": "Modifier un brouillon fait normalement partie du flux de travail, ce n'est pas un état d'échec. La version du clinicien est la note.",
+  "Human-in-the-loop is a workflow, not a disclaimer: the clinician's review is the step that turns a draft into a record.": "L'humain dans la boucle est un flux de travail, non une clause de non-responsabilité : la vérification du clinicien est l'étape qui transforme un brouillon en dossier.",
+  // AI Governance — data handling
+  "Patient information, handled deliberately": "Les informations du patient, traitées avec méthode",
+  "Robi Care processes patient information for one purpose: preparing the note the clinician is working on. It is not repurposed, and it is not used to train models on your patients.": "Robi Care traite les informations du patient dans un seul but : préparer la note sur laquelle le clinicien travaille. Elles ne sont pas réutilisées à d'autres fins et ne servent pas à entraîner des modèles sur vos patients.",
+  "Purpose-limited processing": "Traitement limité à la finalité",
+  "Captured conversation is used to prepare the clinician's note and for nothing else.": "La conversation recueillie sert à préparer la note du clinicien et à rien d'autre.",
+  "Clinic-controlled policy": "Politique contrôlée par la clinique",
+  "Retention and access follow the clinic's own policies, applied to the documentation workflow.": "La conservation et l'accès suivent les politiques propres à la clinique, appliquées au flux de travail documentaire.",
+  "Deployment specifics": "Spécificités du déploiement",
+  "Hosting arrangements and certifications are [certification/region to be confirmed] and are agreed with each clinic.": "Les modalités d'hébergement et les certifications sont [certification/région à confirmer] et sont convenues avec chaque clinique.",
+  // AI Governance — FAQ
+  "Governance questions, answered plainly": "Les questions de gouvernance, expliquées simplement",
+  "The questions clinicians and governance leads ask most often about how Robi Care behaves.": "Les questions que les cliniciens et les responsables de la gouvernance posent le plus souvent sur le comportement de Robi Care.",
+  "Who is responsible for the final clinical note?": "Qui est responsable de la note clinique finale ?",
+  "The clinician. Robi Care produces a structured draft from the captured consultation, but the clinician reviews, edits, and approves it before it is used. The clinician remains the decision-maker for every clinical action recorded in the note.": "Le clinicien. Robi Care produit un brouillon structuré à partir de la consultation recueillie, mais le clinicien le vérifie, le modifie et l'approuve avant son utilisation. Le clinicien reste le décideur pour chaque action clinique consignée dans la note.",
+  "Can a note be filed without a clinician seeing it?": "Une note peut-elle être classée sans qu'un clinicien l'ait vue ?",
+  "No. Review-before-use is a fixed part of the workflow. Generated content stays a draft until a clinician approves it, and the approval is what commits the note to the record.": "Non. La vérification avant utilisation fait partie intégrante du flux de travail. Le contenu généré reste un brouillon tant qu'un clinicien ne l'a pas approuvé, et c'est cette approbation qui inscrit la note au dossier.",
+  "How does the clinician know what the system produced?": "Comment le clinicien sait-il ce que le système a produit ?",
+  "The captured conversation and the generated draft are both visible to the reviewing clinician. Nothing is summarised away without the clinician being able to inspect the source material behind it.": "La conversation recueillie et le brouillon généré sont tous deux visibles par le clinicien qui vérifie. Rien n'est résumé au point que le clinicien ne puisse inspecter le matériel source qui le sous-tend.",
+  "What happens to patient data?": "Qu'advient-il des données des patients ?",
+  "Patient information is processed only to prepare the note the clinician is working on, and it is handled under the clinic's own data-handling policies. Specific hosting arrangements and certifications are [certification/region to be confirmed].": "Les informations du patient ne sont traitées que pour préparer la note sur laquelle le clinicien travaille, et elles sont gérées selon les politiques de traitement des données propres à la clinique. Les modalités d'hébergement et les certifications précises sont [certification/région à confirmer].",
+  "Does Robi Care replace clinical judgement?": "Robi Care remplace-t-il le jugement clinique ?",
+  "No. It removes the typing, not the judgement. The system drafts and organises; the clinician interprets, decides, and signs off.": "Non. Il supprime la saisie, pas le jugement. Le système rédige et organise ; le clinicien interprète, décide et valide.",
+  // AI Governance — closing call to action
+  "Review the governance model with us": "Examinez le modèle de gouvernance avec nous",
+  "Talk to the team about how review-before-use, transparency, and data handling would work in your clinic.": "Parlez à l'équipe de la manière dont la vérification avant utilisation, la transparence et le traitement des données fonctionneraient dans votre clinique.",
+  // Pricing — hero
+  "Transparent pricing, built from real usage": "Une tarification transparente, fondée sur l'usage réel",
+  "Every Robi Care tier is assembled from the same three metered components — transcription, model access, and audio storage — so you can see exactly what you are paying for.": "Chaque formule Robi Care est composée des trois mêmes éléments mesurés — transcription, accès au modèle et stockage audio — afin que vous voyiez exactement ce que vous payez.",
+  "Pricing is metered from the same base unit rates across every tier, with no hidden platform fee.": "La tarification est mesurée selon les mêmes tarifs unitaires de base pour chaque formule, sans frais de plateforme cachés.",
+  // Pricing — tiers section
+  Plans: "Formules",
+  "Three tiers, one platform": "Trois formules, une seule plateforme",
+  "Choose the daily transcription allowance that matches your practice. Each tier includes the full Robi Care workflow on the TMU · TeleMeetUp Enablement Platform.": "Choisissez l'allocation quotidienne de transcription adaptée à votre pratique. Chaque formule inclut l'intégralité du flux de travail Robi Care sur la TMU · TeleMeetUp Enablement Platform.",
+  // Pricing — tier cards
+  "For a single clinician or a small practice getting documentation under control.": "Pour un clinicien seul ou un petit cabinet qui reprend sa documentation en main.",
+  "For a multi-clinician practice that documents across a full working day.": "Pour un cabinet de plusieurs cliniciens qui documente tout au long d'une journée de travail.",
+  "For hospital groups and networks running documentation at organisational scale.": "Pour les groupes hospitaliers et les réseaux qui gèrent la documentation à l'échelle de l'organisation.",
+  "Most popular": "Le plus choisi",
+  "Transcription allowance": "Allocation de transcription",
+  "Speech-to-Text Transcription": "Transcription parole-texte",
+  "7,200 minutes per month": "7 200 minutes par mois",
+  "36,000 minutes per month": "36 000 minutes par mois",
+  "360,000 minutes per month": "360 000 minutes par mois",
+  "Access to ChatGPT": "Accès à ChatGPT",
+  "2,880 units (1,000-token units) per month": "2 880 unités (unités de 1 000 jetons) par mois",
+  "14,400 units (1,000-token units) per month": "14 400 unités (unités de 1 000 jetons) par mois",
+  "144,000 units (1,000-token units) per month": "144 000 unités (unités de 1 000 jetons) par mois",
+  "Audio Recording": "Enregistrement audio",
+  "3.6 GB per month": "3,6 Go par mois",
+  "18 GB per month": "18 Go par mois",
+  "180 GB per month": "180 Go par mois",
+  "Monthly total": "Total mensuel",
+  // Pricing — usage table
+  "Monthly usage breakdown by tier, with unit counts and US$ amounts": "Détail de l'usage mensuel par formule, avec le nombre d'unités et les montants en US$",
+  Units: "Unités",
+  "Number of Units": "Nombre d'unités",
+  US$: "US$",
+  "Speech-to-Text Transcription (minutes)": "Transcription parole-texte (minutes)",
+  "Access to ChatGPT (1,000 tokens)": "Accès à ChatGPT (1 000 jetons)",
+  "Audio Recording (GB per month)": "Enregistrement audio (Go par mois)",
+  // Pricing — base unit rates note
+  "Base unit rates:": "Tarifs unitaires de base :",
+  "Speech-to-Text Transcription $0.074/minute · Access to ChatGPT $0.02 per 1,000 tokens · Audio Recording $5.25/GB per month. Monthly totals are the sum of the metered components shown for each tier.": "Transcription parole-texte 0,074 $/minute · Accès à ChatGPT 0,02 $ par 1 000 jetons · Enregistrement audio 5,25 $/Go par mois. Les totaux mensuels correspondent à la somme des éléments mesurés indiqués pour chaque formule.",
+  // Pricing — included section
+  Included: "Inclus",
+  "What every tier includes": "Ce que chaque formule inclut",
+  "The differences between tiers are capacity, not capability. The workflow itself is the same at every level.": "Les différences entre les formules portent sur la capacité, non sur les fonctionnalités. Le flux de travail lui-même est identique à tous les niveaux.",
+  "The full Robi Care workflow": "L'intégralité du flux de travail Robi Care",
+  "Conversation capture, structured documentation, and follow-up coordination are included in every tier.": "La saisie des conversations, la documentation structurée et la coordination du suivi sont incluses dans chaque formule.",
+  "The TMU · TeleMeetUp account you already have": "Le compte TMU · TeleMeetUp que vous possédez déjà",
+  "Robi Care uses the existing TMU · TeleMeetUp account system, so there is no separate onboarding flow to run.": "Robi Care utilise le système de comptes TMU · TeleMeetUp existant, sans flux d'intégration distinct à exécuter.",
+  "Metered, transparent usage": "Un usage mesuré et transparent",
+  "Each tier is priced from the same three base unit rates, so the monthly total is always traceable to real usage.": "Chaque formule est tarifée à partir des trois mêmes tarifs unitaires de base, de sorte que le total mensuel reste toujours rattaché à l'usage réel.",
+  // Pricing — closing call to action
+  "Start with the tier that fits your practice": "Commencez par la formule adaptée à votre pratique",
+  "Create your account on the TMU · TeleMeetUp Enablement Platform and choose a Robi Care tier when you are ready.": "Créez votre compte sur la TMU · TeleMeetUp Enablement Platform et choisissez une formule Robi Care lorsque vous serez prêt.",
+  // Contact page — hero
+  "Talk to the Robi Care team": "Parlez à l'équipe Robi Care",
+  "Tell us about your documentation workflow and we will show you how Robi Care fits. Every enquiry reaches hello@tmu.ai.": "Décrivez-nous votre flux de travail documentaire et nous vous montrerons comment Robi Care s'y intègre. Chaque demande parvient à hello@tmu.ai.",
+  "Enquiries are answered by the Robi Care team, usually within one business day.": "Les demandes sont traitées par l'équipe Robi Care, généralement sous un jour ouvré.",
+  // Contact page — enquiry section
+  "Send an enquiry": "Envoyer une demande",
+  "How can we help?": "Comment pouvons-nous vous aider ?",
+  "Share a little about your organisation and what you would like to solve. Fields are validated as you go.": "Présentez brièvement votre organisation et ce que vous souhaitez résoudre. Les champs sont validés au fur et à mesure.",
+  // Contact page — contact details
+  "Enquiries submitted here are delivered to the same inbox.": "Les demandes envoyées ici sont transmises à la même boîte de réception.",
+  "Deployment region": "Région de déploiement",
+  "[certification/region to be confirmed]": "[certification/région à confirmer]",
+  "Hosting region and certifications are confirmed per deployment.": "La région d'hébergement et les certifications sont confirmées pour chaque déploiement.",
+  Governance: "Gouvernance",
+  "Robi Care runs on the platform's existing account and governance layer.": "Robi Care s'exécute sur la couche de compte et de gouvernance existante de la plateforme.",
+  // Contact form — labels
+  Name: "Nom",
+  Email: "E-mail",
+  Organisation: "Organisation",
+  Message: "Message",
+  // Contact form — validation messages
+  "Please enter your email address.": "Veuillez saisir votre adresse e-mail.",
+  "Please enter a valid email address.": "Veuillez saisir une adresse e-mail valide.",
+  "Please enter your name.": "Veuillez saisir votre nom.",
+  "Please enter your organisation.": "Veuillez saisir votre organisation.",
+  "Please tell us how we can help.": "Veuillez nous indiquer comment nous pouvons vous aider.",
+  // Contact form — states and actions
+  "Sending…": "Envoi…",
+  "Thank you — your enquiry has been sent": "Merci — votre demande a bien été envoyée",
+  "Your message has reached the Robi Care team at hello@tmu.ai. We usually respond within one business day.": "Votre message est parvenu à l'équipe Robi Care à hello@tmu.ai. Nous répondons généralement sous un jour ouvré.",
+  "We could not send your enquiry just now. Please try again, or email hello@tmu.ai directly.": "Nous n'avons pas pu envoyer votre demande pour le moment. Veuillez réessayer ou écrire directement à hello@tmu.ai.",
+  // Sponsorship page — hero
+  "Sponsorship program": "Programme de parrainage",
+  "Sponsorship is a strategic investment in community healthcare access, not charity.": "Le parrainage est un investissement stratégique dans l'accès aux soins de santé communautaires, et non une œuvre de bienfaisance.",
+  "Robi Care sponsorship puts governed clinical documentation support into the hands of healthcare professionals and institutions who need it — and it is designed to be reported on, reviewed, and renewed like any other investment in the care ecosystem.": "Le parrainage Robi Care met un soutien documentaire clinique gouverné entre les mains des professionnels de santé et des institutions qui en ont besoin — et il est conçu pour être documenté, évalué et renouvelé comme tout autre investissement dans l'écosystème des soins.",
+  "Sponsorship is directed at the clinicians and institutions serving communities with the least capacity to absorb documentation overhead.": "Le parrainage est destiné aux cliniciens et aux institutions qui servent les communautés ayant le moins de capacité à absorber la charge documentaire.",
+  // Sponsorship page — what sponsorship funds
+  "What sponsorship funds": "Ce que finance le parrainage",
+  "Sponsorship subsidizes the subscription, not the standard of care": "Le parrainage subventionne l'abonnement, non la qualité des soins",
+  "Robi Care sponsorship subsidizes subscription costs for healthcare professionals and institutions who need it. The clinician receives the same platform, the same governance model, and the same review-before-use workflow as any paying customer — the sponsor removes the cost barrier, not the capability.": "Le parrainage Robi Care subventionne les coûts d'abonnement des professionnels de santé et des institutions qui en ont besoin. Le clinicien reçoit la même plateforme, le même modèle de gouvernance et le même flux de travail de vérification avant utilisation que tout client payant — le parrain supprime la barrière de coût, non la capacité.",
+  "Underserved communities come first": "Les communautés mal desservies passent en premier",
+  "Sponsored subscriptions are directed to the clinicians and institutions serving communities with the least capacity to absorb documentation overhead.": "Les abonnements parrainés sont destinés aux cliniciens et aux institutions qui servent les communautés ayant le moins de capacité à absorber la charge documentaire.",
+  "The subsidy is the subscription": "La subvention, c'est l'abonnement",
+  "Sponsorship covers the metered subscription cost. It does not buy influence over clinical decisions, which stay with the treating clinician.": "Le parrainage couvre le coût de l'abonnement à l'usage. Il n'achète aucune influence sur les décisions cliniques, qui restent entre les mains du clinicien traitant.",
+  "Access is governed, not gifted": "L'accès est gouverné, non offert",
+  "Sponsored access is administered through the same account and governance model as every other deployment on the platform.": "L'accès parrainé est administré selon le même compte et le même modèle de gouvernance que tout autre déploiement sur la plateforme.",
+  "A sponsored subscription is a working clinical tool, not a donation — it is used in the same workflow as every other Robi Care deployment.": "Un abonnement parrainé est un outil clinique opérationnel, non un don — il est utilisé dans le même flux de travail que tout autre déploiement Robi Care.",
+  // Sponsorship page — who sponsors
+  "Who sponsors": "Qui parraine",
+  "Leading players in the community healthcare ecosystem": "Des acteurs de premier plan de l'écosystème des soins de santé communautaires",
+  "Robi Care sponsors are organisations already invested in community health. They sponsor because access to governed clinical documentation is part of the infrastructure their own work depends on.": "Les parrains de Robi Care sont des organisations déjà engagées dans la santé communautaire. Ils parrainent parce que l'accès à une documentation clinique gouvernée fait partie de l'infrastructure dont dépend leur propre travail.",
+  "Health systems": "Systèmes de santé",
+  "Hospitals, networks and care groups that want documentation support to reach the clinicians and communities they already serve.": "Hôpitaux, réseaux et groupes de soins qui souhaitent que le soutien documentaire atteigne les cliniciens et les communautés qu'ils servent déjà.",
+  NGOs: "ONG",
+  "Development and community organisations funding access to clinical documentation where public capacity is thinnest.": "Organisations de développement et communautaires qui financent l'accès à la documentation clinique là où les capacités publiques sont les plus limitées.",
+  "Healthcare-focused corporations": "Entreprises du secteur de la santé",
+  "Companies whose products and services sit inside the care pathway and who invest in the ecosystem they operate in.": "Entreprises dont les produits et services s'inscrivent dans le parcours de soins et qui investissent dans l'écosystème où elles opèrent.",
+  "Government and PPP partners": "Partenaires gouvernementaux et PPP",
+  "Public institutions and public-private partnerships extending governed clinical AI into national and regional programmes.": "Institutions publiques et partenariats public-privé qui étendent une IA clinique gouvernée à des programmes nationaux et régionaux.",
+  // Sponsorship page — tiers
+  "Sponsorship levels": "Niveaux de parrainage",
+  "Three levels of sponsorship": "Trois niveaux de parrainage",
+  "Each level is defined by how many clinicians or institutions it puts on the platform. Sponsorship is priced from Robi Care's published subscription rates, so the commitment is transparent from the start.": "Chaque niveau est défini par le nombre de cliniciens ou d'institutions qu'il place sur la plateforme. Le parrainage est facturé selon les tarifs d'abonnement publiés de Robi Care, de sorte que l'engagement est transparent dès le départ.",
+  "Sponsors 1 Premium subscription": "Parraine 1 abonnement Premium",
+  "Supports one independent physician or clinician": "Soutient un médecin ou un clinicien indépendant",
+  "The entry point for an organisation that wants to put governed documentation support in the hands of a single clinician who could not otherwise afford it.": "Le point d'entrée pour une organisation qui souhaite mettre un soutien documentaire gouverné entre les mains d'un seul clinicien qui ne pourrait pas se le permettre autrement.",
+  "Sponsors 5 Premium subscriptions": "Parraine 5 abonnements Premium",
+  "Supports a clinic or small care team": "Soutient une clinique ou une petite équipe soignante",
+  "Funds a whole small care team, so a clinic can standardise its documentation workflow across the people who share the same patients.": "Finance toute une petite équipe soignante, afin qu'une clinique puisse uniformiser son flux de travail documentaire entre les personnes qui partagent les mêmes patients.",
+  "Sponsors 10+ Premium subscriptions or a Business-tier deployment": "Parraine 10 abonnements Premium ou plus, ou un déploiement de niveau Business",
+  "Supports a hospital department or regional program": "Soutient un service hospitalier ou un programme régional",
+  "Scales sponsorship to a department or a regional programme, with the deployment shape agreed around the care setting being supported.": "Étend le parrainage à un service ou à un programme régional, la forme du déploiement étant convenue en fonction de l'environnement de soins soutenu.",
+  "Custom — contact us.": "Sur mesure — contactez-nous.",
+  "Sponsorship levels are based on Robi Care's published subscription pricing.": "Les niveaux de parrainage sont fondés sur les tarifs d'abonnement publiés de Robi Care.",
+  // Sponsorship page — closing call to action
+  "Talk to the team about the level of sponsorship that fits your organisation and the community you want to support.": "Parlez à l'équipe du niveau de parrainage adapté à votre organisation et à la communauté que vous souhaitez soutenir.",
+  // Sovereign Deployment — hero
+  "Sovereign Deployment": "Déploiement souverain",
+  "Healthcare enablement operated within the country it serves.": "Une assistance à la santé exploitée dans le pays qu'elle sert.",
+  "Robi Care is available as a managed service, deployed in-country through the SAAAS Platform for Sovereign AI — economical, readily accessible and built for democratized access. Deployment options include locally selected or approved sovereign hosting, local data-residency configuration, jurisdiction-specific retention and consent policies, approved model routing, local language and clinical-document formats, in-country support, and transparent metering and institutional reporting.": "Robi Care est disponible en tant que service géré, déployé dans le pays via la SAAAS Platform for Sovereign AI — économique, aisément accessible et conçu pour un accès démocratisé. Les options de déploiement comprennent un hébergement souverain choisi ou approuvé localement, une configuration locale de résidence des données, des politiques de conservation et de consentement propres à chaque juridiction, un routage de modèles approuvé, des formats locaux de langue et de documents cliniques, un support dans le pays, ainsi qu'une mesure transparente et un reporting institutionnel.",
+  "Deployment is described in workflow terms: where processing happens, who holds custody, and how access is administered.": "Le déploiement est décrit en termes de flux de travail : où le traitement a lieu, qui détient la garde des données et comment l'accès est administré.",
+  // Sovereign Deployment — accessible by design
+  "Accessible by design": "Accessible par conception",
+  "Local service. Sovereign options. Practical economics.": "Service local. Options souveraines. Économie pratique.",
+  "Robi Care is designed for managed, in-country service through SAAAS, supporting local data controls, approved model routing and partnership-led adoption.": "Robi Care est conçu pour un service géré dans le pays via SAAAS, prenant en charge les contrôles locaux des données, un routage de modèles approuvé et une adoption portée par les partenariats.",
+  "In-country operations": "Opérations dans le pays",
+  "Deployment patterns aligned to local institutions, regulation and support.": "Des modèles de déploiement alignés sur les institutions, la réglementation et le support locaux.",
+  "Data sovereignty": "Souveraineté des données",
+  "Configurable residency, retention and access controls for each jurisdiction.": "Des contrôles configurables de résidence, de conservation et d'accès pour chaque juridiction.",
+  "Democratized access": "Accès démocratisé",
+  "Transparent usage-based economics for individual professionals through national programs.": "Une économie transparente fondée sur l'usage pour les professionnels individuels, via des programmes nationaux.",
+  // Sovereign Deployment — the problem
+  "Documentation tools often move clinical data somewhere you cannot see": "Les outils de documentation déplacent souvent les données cliniques vers un lieu que vous ne pouvez pas voir",
+  "When a documentation service is hosted outside the provider's control, the clinical governance team loses visibility of where patient content is processed, who can reach it, and how long it is kept.": "Lorsqu'un service de documentation est hébergé hors du contrôle du prestataire, l'équipe de gouvernance clinique perd la visibilité sur le lieu de traitement du contenu des patients, sur les personnes qui peuvent y accéder et sur la durée de conservation.",
+  "The boundary becomes unclear": "La frontière devient floue",
+  "Once content leaves the clinical environment, the provider can no longer describe the processing boundary in terms its own governance process recognises.": "Une fois le contenu sorti de l'environnement clinique, le prestataire ne peut plus décrire la frontière de traitement dans des termes que son propre processus de gouvernance reconnaît.",
+  "Custody is quietly transferred": "La garde des données est transférée sans bruit",
+  "A vendor that stores the record in its own tenancy becomes a second custodian of clinical data, which complicates retention and deletion.": "Un fournisseur qui stocke le dossier dans son propre environnement devient un second dépositaire des données cliniques, ce qui complique la conservation et la suppression.",
+  "Review is treated as optional": "La vérification est traitée comme facultative",
+  "Generated text that reaches the record without a clinician reading it is a clinical risk, not a time saving.": "Un texte généré qui parvient au dossier sans qu'un clinicien ne l'ait lu constitue un risque clinique, et non un gain de temps.",
+  // Sovereign Deployment — how it works
+  "Four steps, each with a clear owner": "Quatre étapes, chacune avec un responsable clairement identifié",
+  "Sovereign deployment is a workflow property, not a marketing claim. These are the four stages every consultation passes through.": "Le déploiement souverain est une propriété du flux de travail, non une affirmation marketing. Voici les quatre étapes que traverse chaque consultation.",
+  "Capture inside the care setting": "Recueillir au sein du cadre de soins",
+  "The consultation is captured where care already happens — in the room or over a remote session — with no data leaving the clinical environment before it is processed.": "La consultation est recueillie là où les soins ont déjà lieu — en cabinet ou lors d'une session à distance — sans qu'aucune donnée ne quitte l'environnement clinique avant son traitement.",
+  "Process in the deployment you control": "Traiter dans le déploiement que vous contrôlez",
+  "Transcription and structuring run in the deployment your organisation governs, so the processing boundary is the one your clinical governance team has approved.": "La transcription et la structuration s'exécutent dans le déploiement que votre organisation gouverne, de sorte que la frontière de traitement est celle approuvée par votre équipe de gouvernance clinique.",
+  "Review before anything is committed": "Vérifier avant toute validation",
+  "Drafts are presented to the clinician for review. Nothing is written into the record until a person has read it and accepted it.": "Les brouillons sont présentés au clinicien pour vérification. Rien n'est écrit dans le dossier tant qu'une personne ne l'a pas lu et accepté.",
+  "Retain under your own policy": "Conserver selon votre propre politique",
+  "Retention, export, and deletion follow the policy your organisation already applies to clinical records, rather than a vendor default.": "La conservation, l'export et la suppression suivent la politique que votre organisation applique déjà aux dossiers cliniques, plutôt qu'un paramètre par défaut du fournisseur.",
+  // Sovereign Deployment — proof points
+  "What sovereignty means in practice": "Ce que la souveraineté signifie en pratique",
+  "Four commitments that can be checked against your own governance requirements rather than taken on trust.": "Quatre engagements qui peuvent être vérifiés au regard de vos propres exigences de gouvernance plutôt que pris sur parole.",
+  "A defined processing boundary": "Une frontière de traitement définie",
+  "Clinical content is processed within the deployment your organisation governs. The boundary is documented so it can be reviewed, not assumed.": "Le contenu clinique est traité au sein du déploiement que votre organisation gouverne. La frontière est documentée afin de pouvoir être vérifiée, et non présumée.",
+  "Data custody stays with the provider": "La garde des données reste au prestataire",
+  "The care provider remains the custodian of the record. Robi Care operates on the data to produce a draft and does not claim ownership of it.": "Le prestataire de soins reste le dépositaire du dossier. Robi Care opère sur les données pour produire un brouillon et n'en revendique pas la propriété.",
+  "Access tied to existing accounts": "Un accès lié aux comptes existants",
+  "Access uses the TMU · TeleMeetUp account system your organisation already administers, so joiners and leavers are handled by one process.": "L'accès utilise le système de comptes TMU · TeleMeetUp que votre organisation administre déjà, de sorte que les arrivées et les départs sont gérés par un seul processus.",
+  "Reviewable by design": "Vérifiable par conception",
+  "Every draft carries its source consultation and the review decision, so an auditor can trace how a note came to exist.": "Chaque brouillon porte sa consultation source et la décision de vérification, de sorte qu'un auditeur peut retracer la manière dont une note a été créée.",
+  "Deployment details": "Détails du déploiement",
+  "Specific hosting regions and certifications are confirmed per deployment. Where a claim would normally appear, this page shows a placeholder until it is verified with your organisation.": "Les régions d'hébergement et les certifications précises sont confirmées au cas par cas pour chaque déploiement. Là où une affirmation figurerait habituellement, cette page affiche un espace réservé jusqu'à sa vérification avec votre organisation.",
+  "Hosting region": "Région d'hébergement",
+  Certification: "Certification",
+  "Data residency": "Résidence des données",
+  "Underlying platform": "Plateforme sous-jacente",
+  // Sovereign Deployment — closing call to action
+  "Review the deployment model with your governance team": "Examinez le modèle de déploiement avec votre équipe de gouvernance",
+  "Bring your data-protection and clinical-governance leads. We will walk through the processing boundary, custody, access, and retention in the terms your organisation already uses.": "Faites venir vos responsables de la protection des données et de la gouvernance clinique. Nous passerons en revue la frontière de traitement, la garde des données, l'accès et la conservation dans les termes que votre organisation utilise déjà.",
+  "Clinical judgement stays with the clinician; the platform handles the documentation burden around it.": "Le jugement clinique reste au clinicien ; la plateforme prend en charge la charge documentaire qui l'entoure.",
+  "Deploy documentation you can account for": "Déployez une documentation dont vous pouvez rendre compte",
+  "Start on the TMU · TeleMeetUp Enablement Platform and keep clinical content inside a boundary your organisation governs.": "Commencez sur la TMU · TeleMeetUp Enablement Platform et maintenez le contenu clinique à l'intérieur d'une frontière que votre organisation gouverne.",
+  // Partnerships page — hero
+  Partnerships: "Partenariats",
+  "A partnership model for sustainable national access.": "Un modèle de partenariat pour un accès national durable.",
+  "Robi Care partners with clinics, health programmes, and platform integrators who want documentation support embedded in their own care setting rather than bolted on beside it.": "Robi Care s'associe aux cliniques, aux programmes de santé et aux intégrateurs de plateformes qui souhaitent intégrer l'assistance documentaire à leur propre environnement de soins plutôt que de la greffer à côté.",
+  "Partnerships begin with the care setting and the governance requirements that apply to it.": "Les partenariats commencent par l'environnement de soins et les exigences de gouvernance qui s'y appliquent.",
+  // Partnerships page — PPP model
+  "Public-Private Partnerships": "Partenariats public-privé",
+  "How the model is structured": "Comment le modèle est structuré",
+  "Robi Care is deployed through Public-Private Partnerships (PPP) with private enterprise, NGOs and local or national government in each country. Ecocarrier Inc. provides Robi Care, the TMU Enablement Platform and the SAAAS implementation and technical support.": "Robi Care est déployé dans le cadre de partenariats public-privé (PPP) avec des entreprises privées, des ONG et les gouvernements locaux ou nationaux de chaque pays. Ecocarrier Inc. fournit Robi Care, la TMU Enablement Platform ainsi que la mise en œuvre et le support technique SAAAS.",
+  "Public-Private Partnerships bring government, private enterprise, NGOs and healthcare institutions together around one national deployment.": "Les partenariats public-privé réunissent les pouvoirs publics, les entreprises privées, les ONG et les établissements de santé autour d'un même déploiement national.",
+  "Participants in the Robi Care Public-Private Partnership model and their roles": "Participants au modèle de partenariat public-privé de Robi Care et leurs rôles",
+  Participant: "Participant",
+  Role: "Rôle",
+  // Partnerships page — PPP participants
+  "Government or Public Institution": "Gouvernement ou institution publique",
+  "Policy alignment, program sponsorship, public-system participation": "Alignement des politiques, parrainage des programmes, participation au système public",
+  "Local Private Enterprise": "Entreprise privée locale",
+  "Operations, adoption, support and commercial execution": "Exploitation, adoption, support et exécution commerciale",
+  "NGO or Development Partner": "ONG ou partenaire de développement",
+  "Community access, program funding, evaluation, capacity building": "Accès communautaire, financement des programmes, évaluation, renforcement des capacités",
+  "Robi Care, TMU Enablement Platform, SAAAS implementation and technical support": "Robi Care, TMU Enablement Platform, mise en œuvre et support technique SAAAS",
+  "Healthcare Institutions": "Établissements de santé",
+  "Clinical governance, professional oversight and workflow integration": "Gouvernance clinique, supervision professionnelle et intégration des flux de travail",
+  // Partnerships page — models
+  "Partnership models": "Modèles de partenariat",
+  "Three ways to work with us": "Trois façons de travailler avec nous",
+  "Each model has a different starting point, but they share the same platform, the same governance model, and the same review-first approach to clinical documentation.": "Chaque modèle a un point de départ différent, mais tous partagent la même plateforme, le même modèle de gouvernance et la même approche de la documentation clinique fondée sur la vérification préalable.",
+  "Clinics and care providers": "Cliniques et prestataires de soins",
+  "For clinics": "Pour les cliniques",
+  "Adopt Robi Care across a practice or a group of practices, with onboarding that follows your existing clinical governance process.": "Adoptez Robi Care au sein d'un cabinet ou d'un groupe de cabinets, avec une intégration qui suit votre processus de gouvernance clinique existant.",
+  "Rollout support for multi-site clinical teams": "Accompagnement du déploiement pour les équipes cliniques multi-sites",
+  "Configuration aligned to your note structure": "Configuration alignée sur votre structure de notes",
+  "Access administered through your existing accounts": "Accès administré via vos comptes existants",
+  "Health programmes": "Programmes de santé",
+  "For programmes": "Pour les programmes",
+  "Embed documentation support into a funded programme or care pathway, with reporting that reflects the outcomes you are accountable for.": "Intégrez l'assistance documentaire à un programme financé ou à un parcours de soins, avec un reporting qui reflète les résultats dont vous êtes responsable.",
+  "Deployment scoped to a defined care pathway": "Déploiement limité à un parcours de soins défini",
+  "Programme-level visibility of documentation activity": "Visibilité au niveau du programme sur l'activité documentaire",
+  "Governance review built into the rollout plan": "Revue de gouvernance intégrée au plan de déploiement",
+  "Platform integrators": "Intégrateurs de plateformes",
+  "For integrators": "Pour les intégrateurs",
+  "Build on the TMU · TeleMeetUp Enablement Platform and bring Robi Care capabilities into the systems your customers already run.": "Construisez sur la TMU · TeleMeetUp Enablement Platform et intégrez les capacités de Robi Care aux systèmes que vos clients utilisent déjà.",
+  "Shared identity and access through the platform": "Identité et accès partagés via la plateforme",
+  "Integration support from the platform team": "Support d'intégration assuré par l'équipe de la plateforme",
+  "A single governance model across your product": "Un modèle de gouvernance unique pour l'ensemble de votre produit",
+  // Partnerships page — building on the platform
+  "Building on the platform": "Construire sur la plateforme",
+  "What partners build on": "Ce sur quoi les partenaires s'appuient",
+  "The TMU · TeleMeetUp Enablement Platform provides the shared foundations, so partners can focus on the clinical capability rather than rebuilding identity, access, and governance for every customer.": "La TMU · TeleMeetUp Enablement Platform fournit les fondations partagées, afin que les partenaires puissent se concentrer sur la capacité clinique plutôt que de reconstruire l'identité, l'accès et la gouvernance pour chaque client.",
+  "Shared identity and access": "Identité et accès partagés",
+  "Partners inherit the TMU · TeleMeetUp account system, so there is no second onboarding flow to build or maintain.": "Les partenaires héritent du système de comptes TMU · TeleMeetUp, ce qui évite de créer ou de maintenir un second parcours d'intégration.",
+  "One governance model": "Un modèle de gouvernance unique",
+  "Deployment, retention, and review policies are defined once at the platform level and apply to every capability built on it.": "Les politiques de déploiement, de conservation et de vérification sont définies une seule fois au niveau de la plateforme et s'appliquent à chaque capacité construite sur celle-ci.",
+  "Partner support": "Support aux partenaires",
+  "A named contact for technical integration questions, plus documentation for the capabilities you are building against.": "Un contact dédié pour les questions d'intégration technique, ainsi qu'une documentation sur les capacités que vous utilisez.",
+  // Partnerships page — how it starts
+  "How it starts": "Comment cela commence",
+  "From first conversation to organisation-wide rollout": "De la première conversation au déploiement à l'échelle de l'organisation",
+  "A partnership follows four stages, each with a review point before the next begins.": "Un partenariat suit quatre étapes, chacune comportant un point de vérification avant le début de la suivante.",
+  "Scope the partnership": "Définir le périmètre du partenariat",
+  "We start with the care setting, the workflow, and the governance requirements that apply to it.": "Nous commençons par l'environnement de soins, le flux de travail et les exigences de gouvernance qui s'y appliquent.",
+  "Design the integration": "Concevoir l'intégration",
+  "Together we map how Robi Care fits your systems, your note structure, and your account administration.": "Nous définissons ensemble comment Robi Care s'intègre à vos systèmes, à votre structure de notes et à l'administration de vos comptes.",
+  "Pilot with a real team": "Tester avec une équipe réelle",
+  "A contained pilot with one clinical team, measured against the documentation burden it removes.": "Un pilote limité avec une équipe clinique, évalué à l'aune de la charge documentaire qu'il supprime.",
+  "Scale across the organisation": "Déployer à l'échelle de l'organisation",
+  "Once the pilot is reviewed, rollout extends across sites, programmes, or customer accounts.": "Une fois le pilote évalué, le déploiement s'étend aux sites, aux programmes ou aux comptes clients.",
+  // Partnerships page — enquiries
+  "Partnership enquiries": "Demandes de partenariat",
+  "Tell us about the care setting you want to support": "Parlez-nous de l'environnement de soins que vous souhaitez accompagner",
+  "Share the setting, the workflow, and the governance requirements that apply. We will come back with a partnership model and a realistic rollout plan.": "Décrivez l'environnement, le flux de travail et les exigences de gouvernance applicables. Nous reviendrons vers vous avec un modèle de partenariat et un plan de déploiement réaliste.",
+  "Partnership enquiries are handled by the team that supports the platform day to day.": "Les demandes de partenariat sont traitées par l'équipe qui assure le support quotidien de la plateforme.",
+  "Partner with the TMU · TeleMeetUp Enablement Platform": "Devenez partenaire de la TMU · TeleMeetUp Enablement Platform",
+  "Bring documentation support into your clinic, programme, or product with a governance model you can review.": "Intégrez l'assistance documentaire à votre clinique, votre programme ou votre produit avec un modèle de gouvernance que vous pouvez vérifier.",
+  // Sign up — header
+  "Create your account": "Créer votre compte",
+  "Set up Robi Care": "Configurer Robi Care",
+  "Three short steps: tell us who you are, confirm your email address, then review your personal dashboard.": "Trois étapes courtes : dites-nous qui vous êtes, confirmez votre adresse e-mail, puis consultez votre tableau de bord personnel.",
+  // Sign up — progress steps
+  Account: "Compte",
+  "Your details": "Vos informations",
+  Verification: "Vérification",
+  "Confirm your email": "Confirmez votre e-mail",
+  Dashboard: "Tableau de bord",
+  "Your workspace": "Votre espace de travail",
+  "Sign up progress": "Progression de l'inscription",
+  // Sign up — step 1 (account details)
+  "Step 1 of 3": "Étape 1 sur 3",
+  "Account details": "Informations du compte",
+  "We use these details to create your Robi Care account and to reach you about your deployment.": "Nous utilisons ces informations pour créer votre compte Robi Care et vous contacter au sujet de votre déploiement.",
+  "Full Name": "Nom complet",
+  "Email Address": "Adresse e-mail",
+  "Mobile Phone Number": "Numéro de téléphone mobile",
+  // Sign up — step 1 validation messages
+  "Please enter your full name.": "Veuillez saisir votre nom complet.",
+  "Please enter your mobile phone number.": "Veuillez saisir votre numéro de téléphone mobile.",
+  "Use digits, spaces, and + ( ) - . only.": "Utilisez uniquement des chiffres, des espaces et les caractères + ( ) - .",
+  "Please enter a plausible phone number.": "Veuillez saisir un numéro de téléphone plausible.",
+  // Sign up — step 2 (verification)
+  "Step 2 of 3": "Étape 2 sur 3",
+  "Verify your email": "Vérifiez votre e-mail",
+  "Enter the verification code we sent to your email address to confirm it belongs to you.": "Saisissez le code de vérification que nous avons envoyé à votre adresse e-mail pour confirmer qu'elle vous appartient.",
+  "As part of standard account security procedures, identity information may be verified before your account is activated (KYC/AML).": "Dans le cadre des procédures de sécurité standard des comptes, les informations d'identité peuvent être vérifiées avant l'activation de votre compte (KYC/AML).",
+  "Sent to": "Envoyé à",
+  "Verification code": "Code de vérification",
+  "Enter the 4–6 digit code from your email.": "Saisissez le code à 4–6 chiffres reçu par e-mail.",
+  // Sign up — step 3 (personal dashboard)
+  "Step 3 of 3": "Étape 3 sur 3",
+  "Your personal dashboard": "Votre tableau de bord personnel",
+  "Tell us how you work, then review a preview of your usage and billing.": "Dites-nous comment vous travaillez, puis consultez un aperçu de votre utilisation et de votre facturation.",
+  "Personal information": "Informations personnelles",
+  "This helps us tailor Robi Care to your clinical setting. Values are kept while you remain on this page.": "Cela nous aide à adapter Robi Care à votre environnement clinique. Les valeurs sont conservées tant que vous restez sur cette page.",
+  "Usage Summary": "Récapitulatif de l'utilisation",
+  "This is a preview with example data. Your real usage and billing figures will appear here once your account is linked to the TMU Enablement Platform.": "Ceci est un aperçu avec des données d'exemple. Vos chiffres réels d'utilisation et de facturation apparaîtront ici une fois votre compte lié à la TMU Enablement Platform.",
+  "Current Billing Period Cost": "Coût de la période de facturation en cours",
+  "Account & Invoice History": "Historique du compte et des factures",
+  "Your usage and billing details will update automatically once your account is linked to the TMU Enablement Platform.": "Les détails de votre utilisation et de votre facturation seront mis à jour automatiquement une fois votre compte lié à la TMU Enablement Platform.",
+  "Professional role / specialty": "Rôle professionnel / spécialité",
+  "e.g. Emergency Physician": "ex. Médecin urgentiste",
+  "Organization / practice name": "Nom de l'organisation / du cabinet",
+  "e.g. Northshore Family Practice": "ex. Cabinet de médecine familiale Northshore",
+  // Sign up — dashboard usage metrics
+  "Clinical encounters captured": "Rencontres cliniques saisies",
+  "Across the current billing period": "Sur la période de facturation en cours",
+  "Structured notes generated": "Notes structurées générées",
+  "Prepared for clinician review": "Préparées pour vérification par le clinicien",
+  "Documentation time saved": "Temps de documentation économisé",
+  "Estimated against manual entry": "Estimé par rapport à la saisie manuelle",
+  "Active clinician seats": "Postes de cliniciens actifs",
+  "Of 10 provisioned seats": "Sur 10 postes provisionnés",
+  // Sign up — billing summary
+  Estimated: "Estimé",
+  "Clinician seats (6 × $65.00)": "Postes de cliniciens (6 × $65.00)",
+  "Usage overage": "Dépassement d'utilisation",
+  "Platform enablement fee": "Frais d'activation de la plateforme",
+  "Estimated total": "Total estimé",
+  // Sign up — invoice table
+  Invoice: "Facture",
+  Period: "Période",
+  Issued: "Émise le",
+  Amount: "Montant",
+  Status: "Statut",
+  Paid: "Payée",
+  Pending: "En attente",
+  // Sign up — professional role options
+  Physician: "Médecin",
+  Nurse: "Infirmier",
+  "Nurse Practitioner": "Infirmier praticien",
+  "Emergency Physician": "Médecin urgentiste",
+  "Paramedic / EMS": "Paramédical / services médicaux d'urgence",
+  "Clinic Administrator": "Administrateur de clinique",
+  "Hospital Administrator": "Administrateur d'hôpital",
+  "Clinical Informaticist": "Informaticien clinique",
+  Other: "Autre",
+  // Keyboard Liberation — hero
+  "Keyboard liberation": "Keyboard Liberation",
+  "Clinicians should work by speaking, not typing": "Les cliniciens devraient travailler en parlant, non en tapant",
+  "Robi Care captures the consultation as speech and prepares a structured note from it — so the clinician's attention stays on the patient, and the keyboard stops standing between them.": "Robi Care recueille la consultation sous forme de parole et en prépare une note structurée — ainsi l'attention du clinicien reste sur le patient, et le clavier cesse de s'interposer entre eux.",
+  "The consultation stays a conversation. Capture happens in the background while the clinician remains present with the patient.": "La consultation reste une conversation. La saisie s'effectue en arrière-plan pendant que le clinicien reste présent auprès du patient.",
+  // Keyboard Liberation — intro
+  "Let clinicians face patients again.": "Redonnez aux cliniciens la possibilité de faire face aux patients.",
+  "Clinical documentation is indispensable, but the keyboard should not stand between a healthcare professional and the person seeking care. Robi Care uses consent-based, AI-assisted, multilingual voice documentation to transform authorized clinical conversations into reviewable drafts, summaries and structured records — just speak to it in your own language. The clinician remains responsible for verifying, correcting and approving the resulting clinical documentation — this human sign-off is a safety control, not an inconvenience.": "La documentation clinique est indispensable, mais le clavier ne devrait pas s'interposer entre un professionnel de santé et la personne qui sollicite des soins. Robi Care utilise une documentation vocale multilingue, assistée par IA et fondée sur le consentement, pour transformer des conversations cliniques autorisées en brouillons vérifiables, en résumés et en dossiers structurés — il suffit de lui parler dans votre propre langue. Le clinicien reste responsable de vérifier, de corriger et d'approuver la documentation clinique qui en résulte — cette validation humaine est un dispositif de sécurité, non une contrainte.",
+  "A consultation without a keyboard in the room: the clinician's attention stays with the person seeking care.": "Une consultation sans clavier dans la pièce : l'attention du clinicien reste tournée vers la personne qui sollicite des soins.",
+  // Keyboard Liberation — workflow
+  "The workflow": "Le flux de travail",
+  "Seven steps from consent to authorized record": "Sept étapes, du consentement au dossier autorisé",
+  "Each step is governed and reviewable. The clinician approves or corrects the draft before anything becomes part of the record.": "Chaque étape est gouvernée et vérifiable. Le clinicien approuve ou corrige le brouillon avant que quoi que ce soit n'intègre le dossier.",
+  "This approach reflects the broader case made by Dr. Eric Topol for AI-assisted, ambient clinical documentation that frees physicians to focus on patients rather than data entry. Robi Care applies this thinking within a governed, consent-based workflow. This page does not imply that Dr. Topol endorses Robi Care.": "Cette approche reflète l'argument plus large avancé par le Dr Eric Topol en faveur d'une documentation clinique ambiante assistée par IA, qui libère les médecins pour qu'ils se concentrent sur les patients plutôt que sur la saisie de données. Robi Care applique cette réflexion dans un flux de travail gouverné et fondé sur le consentement. Cette page n'implique pas que le Dr Topol approuve Robi Care.",
+  // Keyboard Liberation — problem / before-after
+  "The problem": "Le problème",
+  "Documentation has quietly become the second job": "La documentation est devenue discrètement un second métier",
+  "Clinical time is finite. When a keyboard sits between the clinician and the patient, both the conversation and the record pay for it.": "Le temps clinique est limité. Lorsqu'un clavier s'interpose entre le clinicien et le patient, la conversation comme le dossier en subissent les conséquences.",
+  Before: "Avant",
+  After: "Après",
+  "Keyboard-bound documentation": "Documentation liée au clavier",
+  "Speech-driven documentation": "Documentation guidée par la parole",
+  "Eyes on the screen": "Les yeux sur l'écran",
+  "The clinician types while the patient talks, splitting attention between the person in the room and the form on the display.": "Le clinicien tape pendant que le patient parle, partageant son attention entre la personne présente dans la pièce et le formulaire affiché à l'écran.",
+  "Notes written after the fact": "Des notes rédigées après coup",
+  "Documentation is reconstructed from memory at the end of the day, when the detail of the conversation has already faded.": "La documentation est reconstituée de mémoire en fin de journée, lorsque le détail de la conversation s'est déjà estompé.",
+  "Repetitive strain": "Troubles musculosquelettiques liés aux gestes répétitifs",
+  "Hours of keyboard work accumulate into wrist, neck, and shoulder strain that follows the clinician out of the room.": "Des heures de travail au clavier s'accumulent en tensions du poignet, de la nuque et de l'épaule qui suivent le clinicien hors de la salle.",
+  "Inconsistent structure": "Une structure incohérente",
+  "Every clinician formats notes differently, so the record is hard to scan and harder to hand over.": "Chaque clinicien met en forme ses notes différemment, ce qui rend le dossier difficile à parcourir et plus difficile encore à transmettre.",
+  "Eyes on the patient": "Les yeux sur le patient",
+  "The consultation stays a conversation. Speech is captured in the background while the clinician remains present.": "La consultation reste une conversation. La parole est recueillie en arrière-plan pendant que le clinicien reste présent.",
+  "Notes drafted in the moment": "Des notes rédigées sur le moment",
+  "The conversation is turned into a structured draft while the detail is still fresh, ready for review before the next patient.": "La conversation est transformée en un brouillon structuré tant que le détail est encore frais, prêt à être vérifié avant le patient suivant.",
+  "Voice instead of keystrokes": "La voix plutôt que les frappes",
+  "The keyboard stops being the bottleneck. Clinicians work by speaking, the way they already work with patients.": "Le clavier cesse d'être le goulot d'étranglement. Les cliniciens travaillent en parlant, comme ils travaillent déjà avec les patients.",
+  "One consistent structure": "Une structure cohérente unique",
+  "Every note follows the same reviewed template, so records are predictable to read and straightforward to hand over.": "Chaque note suit le même modèle vérifié, de sorte que les dossiers sont prévisibles à lire et simples à transmettre.",
+  // Keyboard Liberation — how it works steps
+  "How it works": "Comment cela fonctionne",
+  "From spoken consultation to reviewed note": "De la consultation parlée à la note vérifiée",
+  "Four steps, in the order a clinician already works. Capture and structure are automatic; review and record stay with the clinician.": "Quatre étapes, dans l'ordre selon lequel un clinicien travaille déjà. La saisie et la structuration sont automatiques ; la vérification et l'enregistrement restent au clinicien.",
+  Step: "Étape",
+  Capture: "Recueillir",
+  "With the patient's knowledge, the consultation is captured as speech. No typing, no screen between clinician and patient.": "Avec l'accord du patient, la consultation est recueillie sous forme de parole. Aucune frappe, aucun écran entre le clinicien et le patient.",
+  Structure: "Structurer",
+  "The captured conversation is organised into a structured clinical note — history, findings, plan — following the clinic's template.": "La conversation recueillie est organisée en une note clinique structurée — antécédents, observations, plan — selon le modèle de la clinique.",
+  Review: "Vérifier",
+  "The clinician reads the draft, corrects anything that needs correcting, and approves it. Nothing is filed before that review.": "Le clinicien lit le brouillon, corrige ce qui doit l'être et l'approuve. Rien n'est classé avant cette vérification.",
+  Record: "Enregistrer",
+  "Only the approved note is committed to the record, with the clinician's decision recorded alongside it.": "Seule la note approuvée est versée au dossier, la décision du clinicien étant consignée à côté.",
+  // Keyboard Liberation — proof points
+  "Proof points": "Points de preuve",
+  "What changes when the keyboard steps aside": "Ce qui change lorsque le clavier s'efface",
+  "The gains are practical rather than dramatic: more attention in the room, a note that is already drafted, and a record that reads the same way every time.": "Les gains sont pratiques plutôt que spectaculaires : plus d'attention dans la pièce, une note déjà rédigée et un dossier qui se lit de la même manière à chaque fois.",
+  "Hands free": "Mains libres",
+  "Documentation without a keyboard": "Une documentation sans clavier",
+  "The clinician's hands and attention stay with the patient rather than the input device.": "Les mains et l'attention du clinicien restent avec le patient plutôt qu'avec le dispositif de saisie.",
+  "Review first": "Vérification d'abord",
+  "Every note approved before use": "Chaque note approuvée avant utilisation",
+  "Generated output is a draft until a clinician reads and approves it. The clinician remains the decision-maker.": "Le résultat généré reste un brouillon tant qu'un clinicien ne l'a pas lu et approuvé. Le clinicien demeure le décideur.",
+  "One template": "Un seul modèle",
+  "Consistent structure across the clinic": "Une structure cohérente dans toute la clinique",
+  "Notes follow the same reviewed layout, which makes handover and audit straightforward.": "Les notes suivent la même mise en page vérifiée, ce qui facilite la transmission et l'audit.",
+  "Speech-driven capture is a workflow change, not a new way of practising medicine — the clinician still leads the consultation.": "La saisie guidée par la parole est un changement de flux de travail, non une nouvelle façon d'exercer la médecine — le clinicien continue de mener la consultation.",
+  // Keyboard Liberation — closing call to action
+  "Give your clinicians their attention back": "Rendez à vos cliniciens leur attention",
+  "See how speech-driven capture and review-before-use documentation fit the way your clinic already works.": "Découvrez comment la saisie guidée par la parole et la documentation vérifiée avant utilisation s'intègrent à la façon dont votre clinique travaille déjà.",
+  // TMU-KL service section
+  "TMU-KL service": "Service TMU-KL",
+  "A speech-driven documentation service built with Toronto Metropolitan University's Knowledge Lab. Watch the walkthrough, then see what it changes for the clinician in the room.": "Un service de documentation guidé par la parole, conçu avec le Knowledge Lab de l'Université métropolitaine de Toronto. Regardez la démonstration, puis découvrez ce qu'elle change pour le clinicien dans la pièce.",
+  "TMU-KL Keyboard Liberation Service — speech-driven clinical documentation walkthrough": "TMU-KL Keyboard Liberation Service — démonstration de la documentation clinique guidée par la parole",
+  "Video thumbnail: a clinician speaking with a patient while a structured clinical note is drafted on screen beside them.": "Vignette vidéo : un clinicien s'entretient avec un patient pendant qu'une note clinique structurée se rédige à l'écran à côté d'eux.",
+  "Play video:": "Lire la vidéo :",
+  "The walkthrough plays inline on this page. Nothing is loaded from YouTube until you press play.": "La démonstration se lit directement sur cette page. Rien n'est chargé depuis YouTube tant que vous n'appuyez pas sur lecture.",
+  "What it changes": "Ce que cela change",
+  "Four gains for the clinician": "Quatre bénéfices pour le clinicien",
+  "Capture by speaking": "Recueillir en parlant",
+  "Patient encounter details are captured naturally through speech instead of typing, so the clinician stays in the conversation.": "Les détails de la rencontre avec le patient sont recueillis naturellement par la parole plutôt que par la frappe, de sorte que le clinicien reste dans la conversation.",
+  "Structure automatically": "Structurer automatiquement",
+  "The captured encounter is automatically structured and organised into clinical documentation that follows the clinic's template.": "La rencontre recueillie est automatiquement structurée et organisée en une documentation clinique qui suit le modèle de la clinique.",
+  "Draft the follow-up work": "Préparer le travail de suivi",
+  "Draft notes, orders, and follow-up scheduling are prepared for clinician review, ready to be checked rather than written from scratch.": "Les notes en brouillon, les prescriptions et la planification du suivi sont préparés pour la vérification du clinicien, prêts à être contrôlés plutôt qu'à rédiger de zéro.",
+  "Less administration": "Moins d'administration",
+  "Administrative burden drops, so clinicians spend more of their time with patients and less of it at a keyboard.": "La charge administrative diminue, de sorte que les cliniciens consacrent plus de temps aux patients et moins au clavier.",
+  "AI may assist. The clinician decides.": "L'IA peut assister. Le clinicien décide.",
+  "The service assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off.": "Le service assiste uniquement la documentation et la rédaction. Il ne pose pas de diagnostic, ne prescrit pas et n'agit pas. Un clinicien qualifié vérifie et approuve tout contenu clinique avant son utilisation, et rien de ce qui est généré n'atteint le dossier du patient sans cette validation.",
+  // Keyboard Liberation — workflow diagram steps
+  "Patient Consent": "Consentement du patient",
+  "Clinical Encounter": "Rencontre clinique",
+  "Secure Transcription": "Transcription sécurisée",
+  "Structured Draft": "Brouillon structuré",
+  "Clinician Review": "Vérification par le clinicien",
+  "Approve or Correct": "Approuver ou corriger",
+  "Authorized Record": "Dossier autorisé",
+  // Healthcare and clinical disclaimer — hero
+  "Healthcare and clinical disclaimer": "Avertissement médical et clinique",
+  "Clinical safety boundaries, stated plainly": "Les limites de sécurité clinique, énoncées clairement",
+  "Robi Care is an AI-assisted documentation and communication aid for healthcare professionals. It prepares information for professional review; it does not replace clinical judgment, and it is not an emergency service.": "Robi Care est une aide à la documentation et à la communication assistée par IA destinée aux professionnels de santé. Il prépare l'information pour un examen professionnel ; il ne remplace pas le jugement clinique et n'est pas un service d'urgence.",
+  "The clinician remains responsible for every clinical decision and for verifying, correcting, and approving all clinical documentation before it is used.": "Le clinicien reste responsable de chaque décision clinique et de la vérification, de la correction et de l'approbation de toute la documentation clinique avant son utilisation.",
+  // Healthcare and clinical disclaimer — section
+  "What Robi Care is, and what it is not": "Ce que Robi Care est, et ce qu'il n'est pas",
+  "These statements describe the clinical safety boundaries of the service. They apply to every deployment of Robi Care on the TMU · TeleMeetUp Enablement Platform.": "Ces déclarations décrivent les limites de sécurité clinique du service. Elles s'appliquent à chaque déploiement de Robi Care sur la TMU · TeleMeetUp Enablement Platform.",
+  // Healthcare and clinical disclaimer — points
+  "The clinician decides": "Le clinicien décide",
+  "Robi Care prepares information for professional review. It does not diagnose, prescribe, or act, and it does not replace clinical judgment. A qualified clinician reviews and approves all clinical content before it is used.": "Robi Care prépare l'information pour un examen professionnel. Il ne pose pas de diagnostic, ne prescrit pas et n'agit pas, et il ne remplace pas le jugement clinique. Un clinicien qualifié vérifie et approuve tout contenu clinique avant son utilisation.",
+  "Every generated note is a draft until a clinician reviews and approves it. Nothing generated reaches the patient record without that explicit human sign-off.": "Chaque note générée reste un brouillon tant qu'un clinicien ne l'a pas vérifiée et approuvée. Rien de ce qui est généré n'atteint le dossier du patient sans cette validation humaine explicite.",
+  "Not a medical device": "Dispositif non médical",
+  "Robi Care is a documentation and communication aid. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or condition.": "Robi Care est une aide à la documentation et à la communication. Il ne s'agit pas d'un dispositif médical et il n'est pas destiné à diagnostiquer, traiter, guérir ou prévenir une maladie ou une affection.",
+  "Not an emergency service": "Service non destiné aux urgences",
+  "Robi Care is not an emergency service. In an emergency, contact the applicable local emergency service immediately.": "Robi Care n'est pas un service d'urgence. En cas d'urgence, contactez immédiatement le service d'urgence local compétent.",
+  // Healthcare and clinical disclaimer — clinician responsibility
+  "Clinician responsibility": "Responsabilité du clinicien",
+  "The clinician remains the decision-maker": "Le clinicien reste le décideur",
+  "Robi Care assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off.": "Robi Care assiste uniquement la documentation et la rédaction. Il ne pose pas de diagnostic, ne prescrit pas et n'agit pas. Un clinicien qualifié vérifie et approuve tout contenu clinique avant son utilisation, et rien de ce qui est généré n'atteint le dossier du patient sans cette validation.",
+  // Healthcare and clinical disclaimer — closing call to action
+  "Review the clinical safety model with us": "Examinez le modèle de sécurité clinique avec nous",
+  "Talk to the team about how review-before-use, clinician control, and data handling would work in your clinic.": "Parlez à l'équipe de la manière dont la vérification avant utilisation, le contrôle par le clinicien et le traitement des données fonctionneraient dans votre clinique.",
+  // Cookie Notice — hero
+  "Cookie Notice": "Avis relatif aux cookies",
+  "How this site uses cookies": "Comment ce site utilise les cookies",
+  "This notice explains what cookies are, which cookies this site uses, and how you can manage them. It applies to the Robi Care website and is available in both languages.": "Cet avis explique ce que sont les cookies, quels cookies ce site utilise et comment vous pouvez les gérer. Il s'applique au site Robi Care et est disponible dans les deux langues.",
+  "We use cookies to keep the site secure, remember your language preference, and understand how the site is used.": "Nous utilisons des cookies pour assurer la sécurité du site, mémoriser votre préférence de langue et comprendre comment le site est utilisé.",
+  // Cookie Notice — categories
+  "What we use": "Ce que nous utilisons",
+  "The cookies this site uses": "Les cookies utilisés par ce site",
+  "Cookies are small text files stored on your device. We group them by purpose so you can see exactly what each one does.": "Les cookies sont de petits fichiers texte stockés sur votre appareil. Nous les regroupons par finalité afin que vous puissiez voir exactement ce que fait chacun d'eux.",
+  "Strictly necessary cookies": "Cookies strictement nécessaires",
+  "These cookies are required for the site to function, including security, session management, and remembering your language preference. They cannot be switched off.": "Ces cookies sont nécessaires au fonctionnement du site, notamment pour la sécurité, la gestion de session et la mémorisation de votre préférence de langue. Ils ne peuvent pas être désactivés.",
+  "Preference cookies": "Cookies de préférences",
+  "These cookies remember choices you make, such as your selected language, so the site behaves consistently on your return visits.": "Ces cookies mémorisent les choix que vous effectuez, comme la langue sélectionnée, afin que le site se comporte de manière cohérente lors de vos visites ultérieures.",
+  "Analytics cookies": "Cookies de mesure d'audience",
+  "These cookies help us understand how the site is used so we can improve it. They are only set where analytics is enabled for the deployment.": "Ces cookies nous aident à comprendre comment le site est utilisé afin de l'améliorer. Ils ne sont déposés que lorsque la mesure d'audience est activée pour le déploiement.",
+  // Cookie Notice — managing cookies
+  "Managing cookies": "Gérer les cookies",
+  "You are in control of your cookies": "Vous gardez la maîtrise de vos cookies",
+  "You can manage or delete cookies through your browser settings at any time. Blocking strictly necessary cookies may affect how the site works.": "Vous pouvez gérer ou supprimer les cookies à tout moment via les paramètres de votre navigateur. Le blocage des cookies strictement nécessaires peut affecter le fonctionnement du site.",
+  "Browser settings": "Paramètres du navigateur",
+  "Most browsers let you view, manage, and delete cookies. The exact steps depend on your browser and are described in its help pages.": "La plupart des navigateurs vous permettent de consulter, de gérer et de supprimer les cookies. Les étapes exactes dépendent de votre navigateur et sont décrites dans ses pages d'aide.",
+  "Language preference": "Préférence de langue",
+  "Your language choice is stored so the site opens in the language you selected on your return visits. Clearing cookies resets it to English.": "Votre choix de langue est conservé afin que le site s'ouvre dans la langue que vous avez sélectionnée lors de vos visites ultérieures. La suppression des cookies le réinitialise en anglais.",
+  "Questions about this notice": "Questions sur cet avis",
+  "If you have questions about how this site uses cookies, contact the Robi Care team at hello@tmu.ai.": "Si vous avez des questions sur l'utilisation des cookies par ce site, contactez l'équipe Robi Care à hello@tmu.ai.",
+  // Cookie Notice — closing call to action
+  "Questions about privacy and data handling?": "Des questions sur la confidentialité et le traitement des données ?",
+  "Talk to the team about how cookies, data handling, and clinical governance work in your deployment.": "Parlez à l'équipe de la manière dont les cookies, le traitement des données et la gouvernance clinique fonctionnent dans votre déploiement."
+};
+function translate(language, key) {
+  if (language === "en") return key;
+  return FRENCH[key] ?? key;
+}
+const DEFAULT_CONTEXT = {
+  language: DEFAULT_LANGUAGE,
+  setLanguage: () => {
+  },
+  t: (key) => key
+};
+const LanguageContext = reactExports.createContext(DEFAULT_CONTEXT);
+function readStoredLanguage() {
+  if (typeof window === "undefined") return DEFAULT_LANGUAGE;
+  try {
+    return window.localStorage.getItem(LANGUAGE_STORAGE_KEY) === "fr" ? "fr" : DEFAULT_LANGUAGE;
+  } catch {
+    return DEFAULT_LANGUAGE;
+  }
+}
+function LanguageProvider({ children }) {
+  const [language, setLanguageState] = reactExports.useState(readStoredLanguage);
+  const setLanguage = reactExports.useCallback((next) => {
+    setLanguageState(next);
+    try {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, next);
+    } catch {
+    }
+  }, []);
+  const t = reactExports.useCallback((key) => translate(language, key), [language]);
+  reactExports.useEffect(() => {
+    document.documentElement.lang = language;
+    document.title = PAGE_TITLE[language];
+  }, [language]);
+  const value = reactExports.useMemo(
+    () => ({ language, setLanguage, t }),
+    [language, setLanguage, t]
+  );
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(LanguageContext.Provider, { value, children });
+}
 class ExternalBlob {
   constructor(directURL, blob) {
     __publicField(this, "_blob");
@@ -16207,7 +17464,7 @@ function systemSetTimeoutZero(callback) {
   setTimeout(callback, 0);
 }
 var isServer = typeof window === "undefined" || "Deno" in globalThis;
-function noop$6() {
+function noop$5() {
 }
 function functionalUpdate$1(updater, input) {
   return typeof updater === "function" ? updater(input) : updater;
@@ -16830,7 +18087,7 @@ var Query = (_f = class extends Removable {
     var _a2, _b2;
     const promise = (_a2 = __privateGet(this, _retryer)) == null ? void 0 : _a2.promise;
     (_b2 = __privateGet(this, _retryer)) == null ? void 0 : _b2.cancel(options);
-    return promise ? promise.then(noop$6).catch(noop$6) : Promise.resolve();
+    return promise ? promise.then(noop$5).catch(noop$5) : Promise.resolve();
   }
   destroy() {
     super.destroy();
@@ -17535,7 +18792,7 @@ var QueryObserver = (_g = class extends Subscribable {
     fetchOptions
   );
   if (!(fetchOptions == null ? void 0 : fetchOptions.throwOnError)) {
-    promise = promise.catch(noop$6);
+    promise = promise.catch(noop$5);
   }
   return promise;
 }, updateStaleTimeout_fn = function() {
@@ -18124,7 +19381,7 @@ var MutationCache = (_i = class extends Subscribable {
     const pausedMutations = this.getAll().filter((x2) => x2.state.isPaused);
     return notifyManager.batch(
       () => Promise.all(
-        pausedMutations.map((mutation) => mutation.continue().catch(noop$6))
+        pausedMutations.map((mutation) => mutation.continue().catch(noop$5))
       )
     );
   }
@@ -18494,7 +19751,7 @@ var QueryClient = (_l = class {
     const promises = notifyManager.batch(
       () => __privateGet(this, _queryCache).findAll(filters).map((query) => query.cancel(defaultedCancelOptions))
     );
-    return Promise.all(promises).then(noop$6).catch(noop$6);
+    return Promise.all(promises).then(noop$5).catch(noop$5);
   }
   invalidateQueries(filters, options = {}) {
     return notifyManager.batch(() => {
@@ -18522,12 +19779,12 @@ var QueryClient = (_l = class {
       () => __privateGet(this, _queryCache).findAll(filters).filter((query) => !query.isDisabled() && !query.isStatic()).map((query) => {
         let promise = query.fetch(void 0, fetchOptions);
         if (!fetchOptions.throwOnError) {
-          promise = promise.catch(noop$6);
+          promise = promise.catch(noop$5);
         }
         return query.state.fetchStatus === "paused" ? Promise.resolve() : promise;
       })
     );
-    return Promise.all(promises).then(noop$6);
+    return Promise.all(promises).then(noop$5);
   }
   fetchQuery(options) {
     const defaultedOptions = this.defaultQueryOptions(options);
@@ -18540,14 +19797,14 @@ var QueryClient = (_l = class {
     ) ? query.fetch(defaultedOptions) : Promise.resolve(query.state.data);
   }
   prefetchQuery(options) {
-    return this.fetchQuery(options).then(noop$6).catch(noop$6);
+    return this.fetchQuery(options).then(noop$5).catch(noop$5);
   }
   fetchInfiniteQuery(options) {
     options.behavior = infiniteQueryBehavior(options.pages);
     return this.fetchQuery(options);
   }
   prefetchInfiniteQuery(options) {
-    return this.fetchInfiniteQuery(options).then(noop$6).catch(noop$6);
+    return this.fetchInfiniteQuery(options).then(noop$5).catch(noop$5);
   }
   ensureInfiniteQueryData(options) {
     options.behavior = infiniteQueryBehavior(options.pages);
@@ -18649,450 +19906,6 @@ var QueryClient = (_l = class {
     __privateGet(this, _mutationCache2).clear();
   }
 }, _queryCache = new WeakMap(), _mutationCache2 = new WeakMap(), _defaultOptions2 = new WeakMap(), _queryDefaults = new WeakMap(), _mutationDefaults = new WeakMap(), _mountCount = new WeakMap(), _unsubscribeFocus = new WeakMap(), _unsubscribeOnline = new WeakMap(), _l);
-var react = { exports: {} };
-var react_production = {};
-/**
- * @license React
- * react.production.js
- *
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-var REACT_ELEMENT_TYPE$1 = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE$2 = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE$1 = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE$1 = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE$1 = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE$1 = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE$1 = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE$1 = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE$1 = Symbol.for("react.suspense"), REACT_MEMO_TYPE$1 = Symbol.for("react.memo"), REACT_LAZY_TYPE$2 = Symbol.for("react.lazy"), MAYBE_ITERATOR_SYMBOL$1 = Symbol.iterator;
-function getIteratorFn$1(maybeIterable) {
-  if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
-  maybeIterable = MAYBE_ITERATOR_SYMBOL$1 && maybeIterable[MAYBE_ITERATOR_SYMBOL$1] || maybeIterable["@@iterator"];
-  return "function" === typeof maybeIterable ? maybeIterable : null;
-}
-var ReactNoopUpdateQueue = {
-  isMounted: function() {
-    return false;
-  },
-  enqueueForceUpdate: function() {
-  },
-  enqueueReplaceState: function() {
-  },
-  enqueueSetState: function() {
-  }
-}, assign$1 = Object.assign, emptyObject = {};
-function Component(props, context, updater) {
-  this.props = props;
-  this.context = context;
-  this.refs = emptyObject;
-  this.updater = updater || ReactNoopUpdateQueue;
-}
-Component.prototype.isReactComponent = {};
-Component.prototype.setState = function(partialState, callback) {
-  if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
-    throw Error(
-      "takes an object of state variables to update or a function which returns an object of state variables."
-    );
-  this.updater.enqueueSetState(this, partialState, callback, "setState");
-};
-Component.prototype.forceUpdate = function(callback) {
-  this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
-};
-function ComponentDummy() {
-}
-ComponentDummy.prototype = Component.prototype;
-function PureComponent(props, context, updater) {
-  this.props = props;
-  this.context = context;
-  this.refs = emptyObject;
-  this.updater = updater || ReactNoopUpdateQueue;
-}
-var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
-pureComponentPrototype.constructor = PureComponent;
-assign$1(pureComponentPrototype, Component.prototype);
-pureComponentPrototype.isPureReactComponent = true;
-var isArrayImpl$1 = Array.isArray, ReactSharedInternals$2 = { H: null, A: null, T: null, S: null, V: null }, hasOwnProperty$1 = Object.prototype.hasOwnProperty;
-function ReactElement(type, key, self2, source, owner, props) {
-  self2 = props.ref;
-  return {
-    $$typeof: REACT_ELEMENT_TYPE$1,
-    type,
-    key,
-    ref: void 0 !== self2 ? self2 : null,
-    props
-  };
-}
-function cloneAndReplaceKey(oldElement, newKey) {
-  return ReactElement(
-    oldElement.type,
-    newKey,
-    void 0,
-    void 0,
-    void 0,
-    oldElement.props
-  );
-}
-function isValidElement(object) {
-  return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE$1;
-}
-function escape(key) {
-  var escaperLookup = { "=": "=0", ":": "=2" };
-  return "$" + key.replace(/[=:]/g, function(match) {
-    return escaperLookup[match];
-  });
-}
-var userProvidedKeyEscapeRegex = /\/+/g;
-function getElementKey(element, index2) {
-  return "object" === typeof element && null !== element && null != element.key ? escape("" + element.key) : index2.toString(36);
-}
-function noop$1$1() {
-}
-function resolveThenable(thenable) {
-  switch (thenable.status) {
-    case "fulfilled":
-      return thenable.value;
-    case "rejected":
-      throw thenable.reason;
-    default:
-      switch ("string" === typeof thenable.status ? thenable.then(noop$1$1, noop$1$1) : (thenable.status = "pending", thenable.then(
-        function(fulfilledValue) {
-          "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
-        },
-        function(error) {
-          "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
-        }
-      )), thenable.status) {
-        case "fulfilled":
-          return thenable.value;
-        case "rejected":
-          throw thenable.reason;
-      }
-  }
-  throw thenable;
-}
-function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
-  var type = typeof children;
-  if ("undefined" === type || "boolean" === type) children = null;
-  var invokeCallback = false;
-  if (null === children) invokeCallback = true;
-  else
-    switch (type) {
-      case "bigint":
-      case "string":
-      case "number":
-        invokeCallback = true;
-        break;
-      case "object":
-        switch (children.$$typeof) {
-          case REACT_ELEMENT_TYPE$1:
-          case REACT_PORTAL_TYPE$2:
-            invokeCallback = true;
-            break;
-          case REACT_LAZY_TYPE$2:
-            return invokeCallback = children._init, mapIntoArray(
-              invokeCallback(children._payload),
-              array,
-              escapedPrefix,
-              nameSoFar,
-              callback
-            );
-        }
-    }
-  if (invokeCallback)
-    return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl$1(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c2) {
-      return c2;
-    })) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(
-      callback,
-      escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(
-        userProvidedKeyEscapeRegex,
-        "$&/"
-      ) + "/") + invokeCallback
-    )), array.push(callback)), 1;
-  invokeCallback = 0;
-  var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
-  if (isArrayImpl$1(children))
-    for (var i = 0; i < children.length; i++)
-      nameSoFar = children[i], type = nextNamePrefix + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
-        nameSoFar,
-        array,
-        escapedPrefix,
-        type,
-        callback
-      );
-  else if (i = getIteratorFn$1(children), "function" === typeof i)
-    for (children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
-      nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
-        nameSoFar,
-        array,
-        escapedPrefix,
-        type,
-        callback
-      );
-  else if ("object" === type) {
-    if ("function" === typeof children.then)
-      return mapIntoArray(
-        resolveThenable(children),
-        array,
-        escapedPrefix,
-        nameSoFar,
-        callback
-      );
-    array = String(children);
-    throw Error(
-      "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
-    );
-  }
-  return invokeCallback;
-}
-function mapChildren(children, func, context) {
-  if (null == children) return children;
-  var result = [], count2 = 0;
-  mapIntoArray(children, result, "", "", function(child) {
-    return func.call(context, child, count2++);
-  });
-  return result;
-}
-function lazyInitializer(payload) {
-  if (-1 === payload._status) {
-    var ctor = payload._result;
-    ctor = ctor();
-    ctor.then(
-      function(moduleObject) {
-        if (0 === payload._status || -1 === payload._status)
-          payload._status = 1, payload._result = moduleObject;
-      },
-      function(error) {
-        if (0 === payload._status || -1 === payload._status)
-          payload._status = 2, payload._result = error;
-      }
-    );
-    -1 === payload._status && (payload._status = 0, payload._result = ctor);
-  }
-  if (1 === payload._status) return payload._result.default;
-  throw payload._result;
-}
-var reportGlobalError$1 = "function" === typeof reportError ? reportError : function(error) {
-  if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
-    var event = new window.ErrorEvent("error", {
-      bubbles: true,
-      cancelable: true,
-      message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
-      error
-    });
-    if (!window.dispatchEvent(event)) return;
-  } else if ("object" === typeof process && "function" === typeof process.emit) {
-    process.emit("uncaughtException", error);
-    return;
-  }
-  console.error(error);
-};
-function noop$5() {
-}
-react_production.Children = {
-  map: mapChildren,
-  forEach: function(children, forEachFunc, forEachContext) {
-    mapChildren(
-      children,
-      function() {
-        forEachFunc.apply(this, arguments);
-      },
-      forEachContext
-    );
-  },
-  count: function(children) {
-    var n = 0;
-    mapChildren(children, function() {
-      n++;
-    });
-    return n;
-  },
-  toArray: function(children) {
-    return mapChildren(children, function(child) {
-      return child;
-    }) || [];
-  },
-  only: function(children) {
-    if (!isValidElement(children))
-      throw Error(
-        "React.Children.only expected to receive a single React element child."
-      );
-    return children;
-  }
-};
-react_production.Component = Component;
-react_production.Fragment = REACT_FRAGMENT_TYPE$1;
-react_production.Profiler = REACT_PROFILER_TYPE$1;
-react_production.PureComponent = PureComponent;
-react_production.StrictMode = REACT_STRICT_MODE_TYPE$1;
-react_production.Suspense = REACT_SUSPENSE_TYPE$1;
-react_production.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals$2;
-react_production.__COMPILER_RUNTIME = {
-  __proto__: null,
-  c: function(size) {
-    return ReactSharedInternals$2.H.useMemoCache(size);
-  }
-};
-react_production.cache = function(fn) {
-  return function() {
-    return fn.apply(null, arguments);
-  };
-};
-react_production.cloneElement = function(element, config, children) {
-  if (null === element || void 0 === element)
-    throw Error(
-      "The argument must be a React element, but you passed " + element + "."
-    );
-  var props = assign$1({}, element.props), key = element.key, owner = void 0;
-  if (null != config)
-    for (propName in void 0 !== config.ref && (owner = void 0), void 0 !== config.key && (key = "" + config.key), config)
-      !hasOwnProperty$1.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
-  var propName = arguments.length - 2;
-  if (1 === propName) props.children = children;
-  else if (1 < propName) {
-    for (var childArray = Array(propName), i = 0; i < propName; i++)
-      childArray[i] = arguments[i + 2];
-    props.children = childArray;
-  }
-  return ReactElement(element.type, key, void 0, void 0, owner, props);
-};
-react_production.createContext = function(defaultValue) {
-  defaultValue = {
-    $$typeof: REACT_CONTEXT_TYPE$1,
-    _currentValue: defaultValue,
-    _currentValue2: defaultValue,
-    _threadCount: 0,
-    Provider: null,
-    Consumer: null
-  };
-  defaultValue.Provider = defaultValue;
-  defaultValue.Consumer = {
-    $$typeof: REACT_CONSUMER_TYPE$1,
-    _context: defaultValue
-  };
-  return defaultValue;
-};
-react_production.createElement = function(type, config, children) {
-  var propName, props = {}, key = null;
-  if (null != config)
-    for (propName in void 0 !== config.key && (key = "" + config.key), config)
-      hasOwnProperty$1.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
-  var childrenLength = arguments.length - 2;
-  if (1 === childrenLength) props.children = children;
-  else if (1 < childrenLength) {
-    for (var childArray = Array(childrenLength), i = 0; i < childrenLength; i++)
-      childArray[i] = arguments[i + 2];
-    props.children = childArray;
-  }
-  if (type && type.defaultProps)
-    for (propName in childrenLength = type.defaultProps, childrenLength)
-      void 0 === props[propName] && (props[propName] = childrenLength[propName]);
-  return ReactElement(type, key, void 0, void 0, null, props);
-};
-react_production.createRef = function() {
-  return { current: null };
-};
-react_production.forwardRef = function(render) {
-  return { $$typeof: REACT_FORWARD_REF_TYPE$1, render };
-};
-react_production.isValidElement = isValidElement;
-react_production.lazy = function(ctor) {
-  return {
-    $$typeof: REACT_LAZY_TYPE$2,
-    _payload: { _status: -1, _result: ctor },
-    _init: lazyInitializer
-  };
-};
-react_production.memo = function(type, compare2) {
-  return {
-    $$typeof: REACT_MEMO_TYPE$1,
-    type,
-    compare: void 0 === compare2 ? null : compare2
-  };
-};
-react_production.startTransition = function(scope) {
-  var prevTransition = ReactSharedInternals$2.T, currentTransition = {};
-  ReactSharedInternals$2.T = currentTransition;
-  try {
-    var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals$2.S;
-    null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
-    "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop$5, reportGlobalError$1);
-  } catch (error) {
-    reportGlobalError$1(error);
-  } finally {
-    ReactSharedInternals$2.T = prevTransition;
-  }
-};
-react_production.unstable_useCacheRefresh = function() {
-  return ReactSharedInternals$2.H.useCacheRefresh();
-};
-react_production.use = function(usable) {
-  return ReactSharedInternals$2.H.use(usable);
-};
-react_production.useActionState = function(action, initialState, permalink) {
-  return ReactSharedInternals$2.H.useActionState(action, initialState, permalink);
-};
-react_production.useCallback = function(callback, deps) {
-  return ReactSharedInternals$2.H.useCallback(callback, deps);
-};
-react_production.useContext = function(Context) {
-  return ReactSharedInternals$2.H.useContext(Context);
-};
-react_production.useDebugValue = function() {
-};
-react_production.useDeferredValue = function(value, initialValue) {
-  return ReactSharedInternals$2.H.useDeferredValue(value, initialValue);
-};
-react_production.useEffect = function(create, createDeps, update) {
-  var dispatcher = ReactSharedInternals$2.H;
-  if ("function" === typeof update)
-    throw Error(
-      "useEffect CRUD overload is not enabled in this build of React."
-    );
-  return dispatcher.useEffect(create, createDeps);
-};
-react_production.useId = function() {
-  return ReactSharedInternals$2.H.useId();
-};
-react_production.useImperativeHandle = function(ref, create, deps) {
-  return ReactSharedInternals$2.H.useImperativeHandle(ref, create, deps);
-};
-react_production.useInsertionEffect = function(create, deps) {
-  return ReactSharedInternals$2.H.useInsertionEffect(create, deps);
-};
-react_production.useLayoutEffect = function(create, deps) {
-  return ReactSharedInternals$2.H.useLayoutEffect(create, deps);
-};
-react_production.useMemo = function(create, deps) {
-  return ReactSharedInternals$2.H.useMemo(create, deps);
-};
-react_production.useOptimistic = function(passthrough, reducer) {
-  return ReactSharedInternals$2.H.useOptimistic(passthrough, reducer);
-};
-react_production.useReducer = function(reducer, initialArg, init) {
-  return ReactSharedInternals$2.H.useReducer(reducer, initialArg, init);
-};
-react_production.useRef = function(initialValue) {
-  return ReactSharedInternals$2.H.useRef(initialValue);
-};
-react_production.useState = function(initialState) {
-  return ReactSharedInternals$2.H.useState(initialState);
-};
-react_production.useSyncExternalStore = function(subscribe2, getSnapshot, getServerSnapshot) {
-  return ReactSharedInternals$2.H.useSyncExternalStore(
-    subscribe2,
-    getSnapshot,
-    getServerSnapshot
-  );
-};
-react_production.useTransition = function() {
-  return ReactSharedInternals$2.H.useTransition();
-};
-react_production.version = "19.1.5";
-{
-  react.exports = react_production;
-}
-var reactExports = react.exports;
-const React$4 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
-const React$5 = /* @__PURE__ */ _mergeNamespaces({
-  __proto__: null,
-  default: React$4
-}, [reactExports]);
 var QueryClientContext = reactExports.createContext(
   void 0
 );
@@ -19202,7 +20015,7 @@ function useBaseQuery(options, Observer, queryClient2) {
   reactExports.useSyncExternalStore(
     reactExports.useCallback(
       (onStoreChange) => {
-        const unsubscribe = shouldSubscribe ? observer.subscribe(notifyManager.batchCalls(onStoreChange)) : noop$6;
+        const unsubscribe = shouldSubscribe ? observer.subscribe(notifyManager.batchCalls(onStoreChange)) : noop$5;
         observer.updateResult();
         return unsubscribe;
       },
@@ -19239,7 +20052,7 @@ function useBaseQuery(options, Observer, queryClient2) {
       // subscribe to the "cache promise" so that we can finalize the currentThenable once data comes in
       query == null ? void 0 : query.promise
     );
-    promise == null ? void 0 : promise.catch(noop$6).finally(() => {
+    promise == null ? void 0 : promise.catch(noop$5).finally(() => {
       observer.updateResult();
     });
   }
@@ -19269,7 +20082,7 @@ function useMutation(options, queryClient2) {
   );
   const mutate = reactExports.useCallback(
     (variables, mutateOptions) => {
-      observer.mutate(variables, mutateOptions).catch(noop$6);
+      observer.mutate(variables, mutateOptions).catch(noop$5);
     },
     [observer]
   );
@@ -33792,7 +34605,7 @@ const getDefaultConfig = () => {
   const sepia = fromTheme("sepia");
   const skew = fromTheme("skew");
   const space = fromTheme("space");
-  const translate = fromTheme("translate");
+  const translate2 = fromTheme("translate");
   const getOverscroll = () => ["auto", "contain", "none"];
   const getOverflow = () => ["auto", "hidden", "clip", "visible", "scroll"];
   const getSpacingWithAutoAndArbitrary = () => ["auto", isArbitraryValue, spacing];
@@ -35471,14 +36284,14 @@ const getDefaultConfig = () => {
        * @see https://tailwindcss.com/docs/translate
        */
       "translate-x": [{
-        "translate-x": [translate]
+        "translate-x": [translate2]
       }],
       /**
        * Translate Y
        * @see https://tailwindcss.com/docs/translate
        */
       "translate-y": [{
-        "translate-y": [translate]
+        "translate-y": [translate2]
       }],
       /**
        * Skew X
@@ -35880,6 +36693,9 @@ function Button({
     }
   );
 }
+function useTranslation() {
+  return reactExports.useContext(LanguageContext);
+}
 const SITE_NAME = "Robi Care";
 const SIGN_IN_URL = "https://app.telemeetup.com/login";
 const GET_STARTED_URL = "https://app.telemeetup.com/register";
@@ -35939,7 +36755,7 @@ const FOOTER_GROUPS = [
 ];
 const HOME_HERO_IMAGE = {
   src: "/assets/generated/hero-eye-contact-consultation.dim_1920x1080.jpg",
-  alt: "A physician in a white coat sitting face to face with a seated patient in a bright consultation room, holding warm eye contact during their conversation."
+  alt: "A physician examining a young child's ear with an otoscope, with the child's mother present and a colleague nearby, in a clinic exam room."
 };
 const HOME_HERO_COPY = {
   eyebrow: "GOVERNED CLINICAL AI",
@@ -41205,6 +42021,7 @@ function toOcid(value) {
 }
 const linkClass = "rounded text-sm text-foreground/75 transition-smooth hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
 function SiteFooter() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx("footer", { className: "bg-deep-green text-foreground", "data-ocid": "footer", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "container py-16 md:py-20", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-12 sm:grid-cols-2 lg:grid-cols-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -41219,15 +42036,15 @@ function SiteFooter() {
             "data-ocid": "footer.logo"
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 max-w-xs text-sm leading-relaxed text-foreground/70", children: FOOTER_TAGLINE }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-xs text-sm leading-relaxed text-foreground/60", children: FOOTER_PROVISION }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 max-w-xs text-sm leading-relaxed text-foreground/70", children: t(FOOTER_TAGLINE) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-xs text-sm leading-relaxed text-foreground/60", children: t(FOOTER_PROVISION) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 flex flex-wrap gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
             {
               asChild: true,
               className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: GET_STARTED_URL, "data-ocid": "footer.get_started_button", children: "Get Started" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: GET_STARTED_URL, "data-ocid": "footer.get_started_button", children: t("Get Started") })
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41236,7 +42053,7 @@ function SiteFooter() {
               asChild: true,
               variant: "outline",
               className: "rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: SIGN_IN_URL, "data-ocid": "footer.sign_in_button", children: "Sign In" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: SIGN_IN_URL, "data-ocid": "footer.sign_in_button", children: t("Sign In") })
             }
           )
         ] })
@@ -41244,17 +42061,17 @@ function SiteFooter() {
       FOOTER_GROUPS.map((group) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "nav",
         {
-          "aria-label": group.heading,
+          "aria-label": t(group.heading),
           "data-ocid": `footer.group.${toOcid(group.heading)}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xs font-semibold uppercase tracking-[0.18em] text-primary", children: group.heading }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xs font-semibold uppercase tracking-[0.18em] text-primary", children: t(group.heading) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-4 space-y-3", children: group.items.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: item.to ? /* @__PURE__ */ jsxRuntimeExports.jsx(
               Link,
               {
                 to: item.to,
                 "data-ocid": `footer.link.${toOcid(item.label)}`,
                 className: linkClass,
-                children: item.label
+                children: t(item.label)
               }
             ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
               "a",
@@ -41262,7 +42079,7 @@ function SiteFooter() {
                 href: item.href,
                 "data-ocid": `footer.link.${toOcid(item.label)}`,
                 className: linkClass,
-                children: item.label
+                children: t(item.label)
               }
             ) }, item.label)) })
           ]
@@ -41271,13 +42088,13 @@ function SiteFooter() {
       ))
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-14 flex flex-col gap-4 border-t border-border pt-8 text-sm text-foreground/70 md:flex-row md:items-center md:justify-between", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { "data-ocid": "footer.copyright", children: FOOTER_COPYRIGHT }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { "data-ocid": "footer.copyright", children: t(FOOTER_COPYRIGHT) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "p",
         {
           "data-ocid": "footer.emergency_notice",
           className: "md:max-w-xl md:text-right",
-          children: FOOTER_EMERGENCY_NOTICE
+          children: t(FOOTER_EMERGENCY_NOTICE)
         }
       )
     ] })
@@ -41388,7 +42205,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$L = [
+const __iconNode$P = [
   ["path", { d: "M10 10H6", key: "1bsnug" }],
   ["path", { d: "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2", key: "wrbu53" }],
   [
@@ -41403,47 +42220,47 @@ const __iconNode$L = [
   ["circle", { cx: "17", cy: "18", r: "2", key: "332jqn" }],
   ["circle", { cx: "7", cy: "18", r: "2", key: "19iecd" }]
 ];
-const Ambulance = createLucideIcon("ambulance", __iconNode$L);
+const Ambulance = createLucideIcon("ambulance", __iconNode$P);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$K = [
+const __iconNode$O = [
   ["path", { d: "M12 5v14", key: "s699le" }],
   ["path", { d: "m19 12-7 7-7-7", key: "1idqje" }]
 ];
-const ArrowDown = createLucideIcon("arrow-down", __iconNode$K);
+const ArrowDown = createLucideIcon("arrow-down", __iconNode$O);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$J = [
+const __iconNode$N = [
   ["path", { d: "m12 19-7-7 7-7", key: "1l729n" }],
   ["path", { d: "M19 12H5", key: "x3x0zl" }]
 ];
-const ArrowLeft = createLucideIcon("arrow-left", __iconNode$J);
+const ArrowLeft = createLucideIcon("arrow-left", __iconNode$N);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$I = [
+const __iconNode$M = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "m12 5 7 7-7 7", key: "xquz4c" }]
 ];
-const ArrowRight = createLucideIcon("arrow-right", __iconNode$I);
+const ArrowRight = createLucideIcon("arrow-right", __iconNode$M);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$H = [
+const __iconNode$L = [
   ["path", { d: "M2 10v3", key: "1fnikh" }],
   ["path", { d: "M6 6v11", key: "11sgs0" }],
   ["path", { d: "M10 3v18", key: "yhl04a" }],
@@ -41451,14 +42268,14 @@ const __iconNode$H = [
   ["path", { d: "M18 5v13", key: "123xd1" }],
   ["path", { d: "M22 10v3", key: "154ddg" }]
 ];
-const AudioLines = createLucideIcon("audio-lines", __iconNode$H);
+const AudioLines = createLucideIcon("audio-lines", __iconNode$L);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$G = [
+const __iconNode$K = [
   [
     "path",
     {
@@ -41468,14 +42285,14 @@ const __iconNode$G = [
   ],
   ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const BadgeCheck = createLucideIcon("badge-check", __iconNode$G);
+const BadgeCheck = createLucideIcon("badge-check", __iconNode$K);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$F = [
+const __iconNode$J = [
   ["rect", { width: "7", height: "7", x: "14", y: "3", rx: "1", key: "6d4xhi" }],
   [
     "path",
@@ -41485,14 +42302,14 @@ const __iconNode$F = [
     }
   ]
 ];
-const Blocks = createLucideIcon("blocks", __iconNode$F);
+const Blocks = createLucideIcon("blocks", __iconNode$J);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$E = [
+const __iconNode$I = [
   ["path", { d: "M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z", key: "1b4qmf" }],
   ["path", { d: "M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2", key: "i71pzd" }],
   ["path", { d: "M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2", key: "10jefs" }],
@@ -41501,7 +42318,50 @@ const __iconNode$E = [
   ["path", { d: "M10 14h4", key: "kelpxr" }],
   ["path", { d: "M10 18h4", key: "1ulq68" }]
 ];
-const Building2 = createLucideIcon("building-2", __iconNode$E);
+const Building2 = createLucideIcon("building-2", __iconNode$I);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$H = [
+  ["path", { d: "M8 2v4", key: "1cmpym" }],
+  ["path", { d: "M16 2v4", key: "4m81vk" }],
+  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
+  ["path", { d: "M3 10h18", key: "8toen8" }],
+  ["path", { d: "m9 16 2 2 4-4", key: "19s6y9" }]
+];
+const CalendarCheck = createLucideIcon("calendar-check", __iconNode$H);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$G = [
+  ["path", { d: "M3 3v16a2 2 0 0 0 2 2h16", key: "c24i48" }],
+  ["path", { d: "M18 17V9", key: "2bz60n" }],
+  ["path", { d: "M13 17V5", key: "1frdt8" }],
+  ["path", { d: "M8 17v-3", key: "17ska0" }]
+];
+const ChartColumn = createLucideIcon("chart-column", __iconNode$G);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$F = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", __iconNode$F);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$E = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+const ChevronDown = createLucideIcon("chevron-down", __iconNode$E);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41509,29 +42369,40 @@ const Building2 = createLucideIcon("building-2", __iconNode$E);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$D = [
-  ["path", { d: "M8 2v4", key: "1cmpym" }],
-  ["path", { d: "M16 2v4", key: "4m81vk" }],
-  ["rect", { width: "18", height: "18", x: "3", y: "4", rx: "2", key: "1hopcy" }],
-  ["path", { d: "M3 10h18", key: "8toen8" }],
-  ["path", { d: "m9 16 2 2 4-4", key: "19s6y9" }]
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["line", { x1: "12", x2: "12", y1: "8", y2: "12", key: "1pkeuh" }],
+  ["line", { x1: "12", x2: "12.01", y1: "16", y2: "16", key: "4dfq90" }]
 ];
-const CalendarCheck = createLucideIcon("calendar-check", __iconNode$D);
+const CircleAlert = createLucideIcon("circle-alert", __iconNode$D);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$C = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$C);
+const __iconNode$C = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+];
+const CircleCheck = createLucideIcon("circle-check", __iconNode$C);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$B = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$B);
+const __iconNode$B = [
+  ["rect", { width: "8", height: "4", x: "8", y: "2", rx: "1", ry: "1", key: "tgr4d6" }],
+  [
+    "path",
+    {
+      d: "M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2",
+      key: "116196"
+    }
+  ],
+  ["path", { d: "m9 14 2 2 4-4", key: "df797q" }]
+];
+const ClipboardCheck = createLucideIcon("clipboard-check", __iconNode$B);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41539,11 +42410,11 @@ const ChevronDown = createLucideIcon("chevron-down", __iconNode$B);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$A = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["line", { x1: "12", x2: "12", y1: "8", y2: "12", key: "1pkeuh" }],
-  ["line", { x1: "12", x2: "12.01", y1: "16", y2: "16", key: "4dfq90" }]
+  ["path", { d: "m18 16 4-4-4-4", key: "1inbqp" }],
+  ["path", { d: "m6 8-4 4 4 4", key: "15zrgr" }],
+  ["path", { d: "m14.5 4-5 16", key: "e7oirm" }]
 ];
-const CircleAlert = createLucideIcon("circle-alert", __iconNode$A);
+const CodeXml = createLucideIcon("code-xml", __iconNode$A);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41551,10 +42422,11 @@ const CircleAlert = createLucideIcon("circle-alert", __iconNode$A);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$z = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3", key: "msslwz" }],
+  ["path", { d: "M3 5V19A9 3 0 0 0 21 19V5", key: "1wlel7" }],
+  ["path", { d: "M3 12A9 3 0 0 0 21 12", key: "mv7ke4" }]
 ];
-const CircleCheck = createLucideIcon("circle-check", __iconNode$z);
+const Database = createLucideIcon("database", __iconNode$z);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41562,30 +42434,6 @@ const CircleCheck = createLucideIcon("circle-check", __iconNode$z);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$y = [
-  ["path", { d: "m18 16 4-4-4-4", key: "1inbqp" }],
-  ["path", { d: "m6 8-4 4 4 4", key: "15zrgr" }],
-  ["path", { d: "m14.5 4-5 16", key: "e7oirm" }]
-];
-const CodeXml = createLucideIcon("code-xml", __iconNode$y);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$x = [
-  ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3", key: "msslwz" }],
-  ["path", { d: "M3 5V19A9 3 0 0 0 21 19V5", key: "1wlel7" }],
-  ["path", { d: "M3 12A9 3 0 0 0 21 12", key: "mv7ke4" }]
-];
-const Database = createLucideIcon("database", __iconNode$x);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$w = [
   ["path", { d: "M21.54 15H17a2 2 0 0 0-2 2v4.54", key: "1djwo0" }],
   [
     "path",
@@ -41597,14 +42445,14 @@ const __iconNode$w = [
   ["path", { d: "M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05", key: "14pb5j" }],
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }]
 ];
-const Earth = createLucideIcon("earth", __iconNode$w);
+const Earth = createLucideIcon("earth", __iconNode$y);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$v = [
+const __iconNode$x = [
   [
     "path",
     {
@@ -41614,26 +42462,26 @@ const __iconNode$v = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-const Eye = createLucideIcon("eye", __iconNode$v);
+const Eye = createLucideIcon("eye", __iconNode$x);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$u = [
+const __iconNode$w = [
   ["path", { d: "M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4", key: "1pf5j1" }],
   ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
   ["path", { d: "m3 15 2 2 4-4", key: "1lhrkk" }]
 ];
-const FileCheck2 = createLucideIcon("file-check-2", __iconNode$u);
+const FileCheck2 = createLucideIcon("file-check-2", __iconNode$w);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$t = [
+const __iconNode$v = [
   ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
   [
     "path",
@@ -41642,28 +42490,28 @@ const __iconNode$t = [
   ["path", { d: "m9 18-1.5-1.5", key: "1j6qii" }],
   ["circle", { cx: "5", cy: "14", r: "3", key: "ufru5t" }]
 ];
-const FileSearch = createLucideIcon("file-search", __iconNode$t);
+const FileSearch = createLucideIcon("file-search", __iconNode$v);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$s = [
+const __iconNode$u = [
   ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
   ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
   ["path", { d: "M10 9H8", key: "b1mrlr" }],
   ["path", { d: "M16 13H8", key: "t4e002" }],
   ["path", { d: "M16 17H8", key: "z1uh3a" }]
 ];
-const FileText = createLucideIcon("file-text", __iconNode$s);
+const FileText = createLucideIcon("file-text", __iconNode$u);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$r = [
+const __iconNode$t = [
   ["path", { d: "m11 17 2 2a1 1 0 1 0 3-3", key: "efffak" }],
   [
     "path",
@@ -41676,14 +42524,14 @@ const __iconNode$r = [
   ["path", { d: "M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3", key: "1uvwmv" }],
   ["path", { d: "M3 4h8", key: "1ep09j" }]
 ];
-const Handshake = createLucideIcon("handshake", __iconNode$r);
+const Handshake = createLucideIcon("handshake", __iconNode$t);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$q = [
+const __iconNode$s = [
   [
     "path",
     {
@@ -41701,7 +42549,36 @@ const __iconNode$q = [
   ["path", { d: "m18 15-2-2", key: "60u0ii" }],
   ["path", { d: "m15 18-2-2", key: "6p76be" }]
 ];
-const HeartHandshake = createLucideIcon("heart-handshake", __iconNode$q);
+const HeartHandshake = createLucideIcon("heart-handshake", __iconNode$s);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$r = [
+  [
+    "path",
+    {
+      d: "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
+      key: "c3ymky"
+    }
+  ],
+  ["path", { d: "M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27", key: "1uw2ng" }]
+];
+const HeartPulse = createLucideIcon("heart-pulse", __iconNode$r);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$q = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "M12 16v-4", key: "1dtifu" }],
+  ["path", { d: "M12 8h.01", key: "e9boi3" }]
+];
+const Info = createLucideIcon("info", __iconNode$q);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41712,13 +42589,13 @@ const __iconNode$p = [
   [
     "path",
     {
-      d: "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
-      key: "c3ymky"
+      d: "M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z",
+      key: "1s6t7t"
     }
   ],
-  ["path", { d: "M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27", key: "1uw2ng" }]
+  ["circle", { cx: "16.5", cy: "7.5", r: ".5", fill: "currentColor", key: "w0ekpg" }]
 ];
-const HeartPulse = createLucideIcon("heart-pulse", __iconNode$p);
+const KeyRound = createLucideIcon("key-round", __iconNode$p);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41726,35 +42603,6 @@ const HeartPulse = createLucideIcon("heart-pulse", __iconNode$p);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$o = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "M12 16v-4", key: "1dtifu" }],
-  ["path", { d: "M12 8h.01", key: "e9boi3" }]
-];
-const Info = createLucideIcon("info", __iconNode$o);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$n = [
-  [
-    "path",
-    {
-      d: "M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z",
-      key: "1s6t7t"
-    }
-  ],
-  ["circle", { cx: "16.5", cy: "7.5", r: ".5", fill: "currentColor", key: "w0ekpg" }]
-];
-const KeyRound = createLucideIcon("key-round", __iconNode$n);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$m = [
   ["path", { d: "M10 18v-7", key: "wt116b" }],
   [
     "path",
@@ -41768,14 +42616,14 @@ const __iconNode$m = [
   ["path", { d: "M3 22h18", key: "8prr45" }],
   ["path", { d: "M6 18v-7", key: "1ivflk" }]
 ];
-const Landmark = createLucideIcon("landmark", __iconNode$m);
+const Landmark = createLucideIcon("landmark", __iconNode$o);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$l = [
+const __iconNode$n = [
   [
     "path",
     {
@@ -41798,14 +42646,14 @@ const __iconNode$l = [
     }
   ]
 ];
-const Layers = createLucideIcon("layers", __iconNode$l);
+const Layers = createLucideIcon("layers", __iconNode$n);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$k = [
+const __iconNode$m = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "m4.93 4.93 4.24 4.24", key: "1ymg45" }],
   ["path", { d: "m14.83 9.17 4.24-4.24", key: "1cb5xl" }],
@@ -41813,15 +42661,38 @@ const __iconNode$k = [
   ["path", { d: "m9.17 14.83-4.24 4.24", key: "bqpfvv" }],
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }]
 ];
-const LifeBuoy = createLucideIcon("life-buoy", __iconNode$k);
+const LifeBuoy = createLucideIcon("life-buoy", __iconNode$m);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$j = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-const LoaderCircle = createLucideIcon("loader-circle", __iconNode$j);
+const __iconNode$l = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
+const LoaderCircle = createLucideIcon("loader-circle", __iconNode$l);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$k = [
+  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
+  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
+];
+const Lock = createLucideIcon("lock", __iconNode$k);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$j = [
+  ["path", { d: "M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8", key: "12jkf8" }],
+  ["path", { d: "m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7", key: "1ocrg3" }],
+  ["path", { d: "m16 19 2 2 4-4", key: "1b14m6" }]
+];
+const MailCheck = createLucideIcon("mail-check", __iconNode$j);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41829,10 +42700,10 @@ const LoaderCircle = createLucideIcon("loader-circle", __iconNode$j);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$i = [
-  ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
-  ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
+  ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
+  ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
 ];
-const Lock = createLucideIcon("lock", __iconNode$i);
+const Mail = createLucideIcon("mail", __iconNode$i);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41840,29 +42711,6 @@ const Lock = createLucideIcon("lock", __iconNode$i);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$h = [
-  ["path", { d: "M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8", key: "12jkf8" }],
-  ["path", { d: "m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7", key: "1ocrg3" }],
-  ["path", { d: "m16 19 2 2 4-4", key: "1b14m6" }]
-];
-const MailCheck = createLucideIcon("mail-check", __iconNode$h);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$g = [
-  ["path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7", key: "132q7q" }],
-  ["rect", { x: "2", y: "4", width: "20", height: "16", rx: "2", key: "izxlao" }]
-];
-const Mail = createLucideIcon("mail", __iconNode$g);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$f = [
   [
     "path",
     {
@@ -41872,19 +42720,39 @@ const __iconNode$f = [
   ],
   ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
 ];
-const MapPin = createLucideIcon("map-pin", __iconNode$f);
+const MapPin = createLucideIcon("map-pin", __iconNode$h);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$e = [
+const __iconNode$g = [
   ["path", { d: "M4 12h16", key: "1lakjw" }],
   ["path", { d: "M4 18h16", key: "19g7jn" }],
   ["path", { d: "M4 6h16", key: "1o0s65" }]
 ];
-const Menu = createLucideIcon("menu", __iconNode$e);
+const Menu = createLucideIcon("menu", __iconNode$g);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$f = [
+  ["path", { d: "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z", key: "131961" }],
+  ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
+  ["line", { x1: "12", x2: "12", y1: "19", y2: "22", key: "x3vr5v" }]
+];
+const Mic = createLucideIcon("mic", __iconNode$f);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$e = [["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]];
+const Play = createLucideIcon("play", __iconNode$e);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41892,19 +42760,27 @@ const Menu = createLucideIcon("menu", __iconNode$e);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$d = [
-  ["path", { d: "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z", key: "131961" }],
-  ["path", { d: "M19 10v2a7 7 0 0 1-14 0v-2", key: "1vc78b" }],
-  ["line", { x1: "12", x2: "12", y1: "19", y2: "22", key: "x3vr5v" }]
+  ["path", { d: "M12 22v-5", key: "1ega77" }],
+  ["path", { d: "M9 8V2", key: "14iosj" }],
+  ["path", { d: "M15 8V2", key: "18g5xt" }],
+  ["path", { d: "M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z", key: "osxo6l" }]
 ];
-const Mic = createLucideIcon("mic", __iconNode$d);
+const Plug = createLucideIcon("plug", __iconNode$d);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$c = [["polygon", { points: "6 3 20 12 6 21 6 3", key: "1oa8hb" }]];
-const Play = createLucideIcon("play", __iconNode$c);
+const __iconNode$c = [
+  [
+    "path",
+    { d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z", key: "q3az6g" }
+  ],
+  ["path", { d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8", key: "1h4pet" }],
+  ["path", { d: "M12 17.5v-11", key: "1jc1ny" }]
+];
+const Receipt = createLucideIcon("receipt", __iconNode$c);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41912,12 +42788,10 @@ const Play = createLucideIcon("play", __iconNode$c);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$b = [
-  ["path", { d: "M12 22v-5", key: "1ega77" }],
-  ["path", { d: "M9 8V2", key: "14iosj" }],
-  ["path", { d: "M15 8V2", key: "18g5xt" }],
-  ["path", { d: "M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z", key: "osxo6l" }]
+  ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
+  ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
 ];
-const Plug = createLucideIcon("plug", __iconNode$b);
+const RotateCcw = createLucideIcon("rotate-ccw", __iconNode$b);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41927,12 +42801,14 @@ const Plug = createLucideIcon("plug", __iconNode$b);
 const __iconNode$a = [
   [
     "path",
-    { d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z", key: "q3az6g" }
+    {
+      d: "M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",
+      key: "1ffxy3"
+    }
   ],
-  ["path", { d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8", key: "1h4pet" }],
-  ["path", { d: "M12 17.5v-11", key: "1jc1ny" }]
+  ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
 ];
-const Receipt = createLucideIcon("receipt", __iconNode$a);
+const Send = createLucideIcon("send", __iconNode$a);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41940,10 +42816,12 @@ const Receipt = createLucideIcon("receipt", __iconNode$a);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$9 = [
-  ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
-  ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
+  ["path", { d: "M20 7h-9", key: "3s1dr2" }],
+  ["path", { d: "M14 17H5", key: "gfn3mx" }],
+  ["circle", { cx: "17", cy: "17", r: "3", key: "18b49y" }],
+  ["circle", { cx: "7", cy: "7", r: "3", key: "dfmy0x" }]
 ];
-const RotateCcw = createLucideIcon("rotate-ccw", __iconNode$9);
+const Settings2 = createLucideIcon("settings-2", __iconNode$9);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41954,13 +42832,13 @@ const __iconNode$8 = [
   [
     "path",
     {
-      d: "M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z",
-      key: "1ffxy3"
+      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+      key: "oel41y"
     }
   ],
-  ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const Send = createLucideIcon("send", __iconNode$8);
+const ShieldCheck = createLucideIcon("shield-check", __iconNode$8);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -41968,23 +42846,6 @@ const Send = createLucideIcon("send", __iconNode$8);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$7 = [
-  [
-    "path",
-    {
-      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
-      key: "oel41y"
-    }
-  ],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
-];
-const ShieldCheck = createLucideIcon("shield-check", __iconNode$7);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$6 = [
   ["path", { d: "M7 18v-6a5 5 0 1 1 10 0v6", key: "pcx96s" }],
   [
     "path",
@@ -41997,7 +42858,21 @@ const __iconNode$6 = [
   ["path", { d: "m4.929 4.929.707.707", key: "1i51kw" }],
   ["path", { d: "M12 12v6", key: "3ahymv" }]
 ];
-const Siren = createLucideIcon("siren", __iconNode$6);
+const Siren = createLucideIcon("siren", __iconNode$7);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$6 = [
+  ["path", { d: "M11 2v2", key: "1539x4" }],
+  ["path", { d: "M5 2v2", key: "1yf1q8" }],
+  ["path", { d: "M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1", key: "rb5t3r" }],
+  ["path", { d: "M8 15a6 6 0 0 0 12 0v-3", key: "x18d4x" }],
+  ["circle", { cx: "20", cy: "10", r: "2", key: "ts1r5v" }]
+];
+const Stethoscope = createLucideIcon("stethoscope", __iconNode$6);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -42005,13 +42880,10 @@ const Siren = createLucideIcon("siren", __iconNode$6);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$5 = [
-  ["path", { d: "M11 2v2", key: "1539x4" }],
-  ["path", { d: "M5 2v2", key: "1yf1q8" }],
-  ["path", { d: "M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1", key: "rb5t3r" }],
-  ["path", { d: "M8 15a6 6 0 0 0 12 0v-3", key: "x18d4x" }],
-  ["circle", { cx: "20", cy: "10", r: "2", key: "ts1r5v" }]
+  ["path", { d: "M16 7h6v6", key: "box55l" }],
+  ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
 ];
-const Stethoscope = createLucideIcon("stethoscope", __iconNode$5);
+const TrendingUp = createLucideIcon("trending-up", __iconNode$5);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -42019,10 +42891,17 @@ const Stethoscope = createLucideIcon("stethoscope", __iconNode$5);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$4 = [
-  ["path", { d: "M16 7h6v6", key: "box55l" }],
-  ["path", { d: "m22 7-8.5 8.5-5-5L2 17", key: "1t1m79" }]
+  [
+    "path",
+    {
+      d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3",
+      key: "wmoenq"
+    }
+  ],
+  ["path", { d: "M12 9v4", key: "juzpu7" }],
+  ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-const TrendingUp = createLucideIcon("trending-up", __iconNode$4);
+const TriangleAlert = createLucideIcon("triangle-alert", __iconNode$4);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -42071,7 +42950,43 @@ const __iconNode = [
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
 const X = createLucideIcon("x", __iconNode);
+function LanguageToggle({ className }) {
+  const { language, setLanguage, t } = useTranslation();
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "fieldset",
+    {
+      "data-ocid": "nav.language_toggle",
+      className: cn(
+        "inline-flex items-center gap-0.5 rounded-full border-hairline bg-card p-0.5",
+        className
+      ),
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("legend", { className: "sr-only", children: t("Language") }),
+        LANGUAGES.map((option) => {
+          const isActive = language === option.code;
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => setLanguage(option.code),
+              "aria-pressed": isActive,
+              "aria-label": option.label,
+              "data-ocid": `nav.language.${option.code}`,
+              className: cn(
+                "min-h-11 rounded-full px-3 text-xs font-bold uppercase tracking-[0.12em] transition-smooth focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 xl:min-h-9",
+                isActive ? "bg-primary text-primary-foreground" : "text-foreground/70 hover:bg-muted hover:text-foreground"
+              ),
+              children: option.shortLabel
+            },
+            option.code
+          );
+        })
+      ]
+    }
+  );
+}
 function SiteHeader() {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = reactExports.useState(false);
   const pathname = useRouterState({
     select: (state) => state.location.pathname
@@ -42091,7 +43006,7 @@ function SiteHeader() {
       {
         className: "border-b border-hairline bg-deep-green",
         "data-ocid": "nav.banner",
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "py-2 text-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-primary", children: HEADER_BANNER_TEXT }) })
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "py-2 text-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-primary", children: t(HEADER_BANNER_TEXT) }) })
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-20 items-center justify-between gap-4 md:h-24", children: [
@@ -42099,7 +43014,7 @@ function SiteHeader() {
         Link,
         {
           to: "/",
-          "aria-label": `${SITE_NAME} home`,
+          "aria-label": t(`${SITE_NAME} home`),
           className: "flex min-w-0 items-center rounded-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
           "data-ocid": "nav.home_link",
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -42118,7 +43033,7 @@ function SiteHeader() {
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "nav",
         {
-          "aria-label": "Primary",
+          "aria-label": t("Primary"),
           className: "hidden items-center gap-1 xl:flex",
           "data-ocid": "nav.primary",
           children: NAV_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -42132,7 +43047,7 @@ function SiteHeader() {
                 isActive(item.to) ? "text-primary" : "text-foreground/75 hover:bg-muted hover:text-foreground"
               ),
               children: [
-                item.label,
+                t(item.label),
                 isActive(item.to) ? /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "span",
                   {
@@ -42147,13 +43062,14 @@ function SiteHeader() {
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden items-center gap-2 xl:flex", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(LanguageToggle, {}),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Button,
           {
             asChild: true,
             variant: "outline",
             className: "rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: ACCOUNT_DEMO_URL, "data-ocid": "nav.account_demo_button", children: "Account demo" })
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: ACCOUNT_DEMO_URL, "data-ocid": "nav.account_demo_button", children: t("Account demo") })
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -42161,7 +43077,7 @@ function SiteHeader() {
           {
             asChild: true,
             className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: SIGN_UP_ROUTE, "data-ocid": "nav.sign_up_button", children: SIGN_UP_LABEL })
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: SIGN_UP_ROUTE, "data-ocid": "nav.sign_up_button", children: t(SIGN_UP_LABEL) })
           }
         )
       ] }),
@@ -42172,7 +43088,7 @@ function SiteHeader() {
           onClick: () => setMenuOpen((open) => !open),
           "aria-expanded": menuOpen,
           "aria-controls": "mobile-nav",
-          "aria-label": menuOpen ? "Close navigation menu" : "Open navigation menu",
+          "aria-label": menuOpen ? t("Close navigation menu") : t("Open navigation menu"),
           "data-ocid": "nav.menu_toggle",
           className: "grid size-11 place-items-center rounded-lg border-hairline bg-card text-foreground transition-smooth hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 xl:hidden",
           children: menuOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(X, { "aria-hidden": "true", className: "size-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Menu, { "aria-hidden": "true", className: "size-5" })
@@ -42186,7 +43102,7 @@ function SiteHeader() {
         "data-ocid": "nav.mobile_menu",
         className: "border-t border-hairline bg-card xl:hidden",
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "container py-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { "aria-label": "Mobile", className: "flex flex-col", children: NAV_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { "aria-label": t("Mobile"), className: "flex flex-col", children: NAV_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx(
             Link,
             {
               to: item.to,
@@ -42197,11 +43113,12 @@ function SiteHeader() {
                 "rounded-lg px-3 py-3 text-base font-medium transition-smooth",
                 isActive(item.to) ? "bg-muted text-primary" : "text-foreground hover:bg-muted"
               ),
-              children: item.label
+              children: t(item.label)
             },
             item.to
           )) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex flex-col gap-2 border-t border-hairline pt-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(LanguageToggle, { className: "self-start" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
               {
@@ -42213,7 +43130,7 @@ function SiteHeader() {
                   {
                     href: ACCOUNT_DEMO_URL,
                     "data-ocid": "nav.mobile_account_demo_button",
-                    children: "Account demo"
+                    children: t("Account demo")
                   }
                 )
               }
@@ -42229,7 +43146,7 @@ function SiteHeader() {
                     to: SIGN_UP_ROUTE,
                     onClick: () => setMenuOpen(false),
                     "data-ocid": "nav.mobile_sign_up_button",
-                    children: SIGN_UP_LABEL
+                    children: t(SIGN_UP_LABEL)
                   }
                 )
               }
@@ -42272,6 +43189,7 @@ const BRANCHES = [
   "Evidence Ledger and Audit Receipts"
 ];
 function GovernanceArchitectureDiagram() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "figure",
     {
@@ -42279,23 +43197,36 @@ function GovernanceArchitectureDiagram() {
       className: "rounded-xl border-hairline bg-card p-6 shadow-subtle md:p-10",
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("figcaption", { className: "mb-8 max-w-2xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold tracking-tight text-foreground md:text-xl", children: "Governance architecture" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "How a request moves from a care team member to a signed clinical record, and where identity, policy, evidence and human review sit in that path." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold tracking-tight text-foreground md:text-xl", children: t("Governance architecture") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+            "How a request moves from a care team member to a signed clinical record, and where identity, policy, evidence and human review sit in that path."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "mx-auto flex max-w-3xl list-none flex-col items-stretch", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: "Clinician/Nurse/EMS/Administrator" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: t("Clinician/Nurse/EMS/Administrator") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: "Robi Care PWA" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: t("Robi Care PWA") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: "Identity, Consent and Role Controls", emphasis: true }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            DiagramNode,
+            {
+              label: t("Identity, Consent and Role Controls"),
+              emphasis: true
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: "SSOT-AI-GOV Policy Gates", emphasis: true }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, { label: "parallel branches" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "grid list-none gap-4 sm:grid-cols-2", children: BRANCHES.map((branch) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: branch }) }, branch)) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, { label: "converge" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: "Approved AI Models and Clinical/Administrative Systems" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: t("SSOT-AI-GOV Policy Gates"), emphasis: true }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, { label: t("parallel branches") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "grid list-none gap-4 sm:grid-cols-2", children: BRANCHES.map((branch) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: t(branch) }) }, branch)) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, { label: t("converge") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            DiagramNode,
+            {
+              label: t("Approved AI Models and Clinical/Administrative Systems")
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(FlowArrow, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: "Clinician Review and Sign-off", emphasis: true }) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(DiagramNode, { label: t("Clinician Review and Sign-off"), emphasis: true }) })
         ] })
       ]
     }
@@ -43232,6 +44163,7 @@ function AccordionContent({
   );
 }
 function GovernanceFaq({ items }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Accordion, { type: "single", collapsible: true, className: "w-full space-y-3", children: items.map((item, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
     AccordionItem,
     {
@@ -43243,10 +44175,10 @@ function GovernanceFaq({ items }) {
           {
             "data-ocid": `governance.faq.item.${index2 + 1}`,
             className: "py-5 text-left text-base font-semibold text-foreground hover:text-primary hover:no-underline md:text-lg",
-            children: item.question
+            children: t(item.question)
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionContent, { className: "border-t border-hairline pb-5 pt-4 text-sm leading-relaxed text-muted-foreground md:text-base", children: item.answer })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(AccordionContent, { className: "border-t border-hairline pb-5 pt-4 text-sm leading-relaxed text-muted-foreground md:text-base", children: t(item.answer) })
       ]
     },
     item.question
@@ -43257,10 +44189,11 @@ function CtaBand({
   title,
   description
 }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "bg-deep-green py-20 text-foreground md:py-28", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto max-w-3xl text-center", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: eyebrow }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-3xl font-semibold tracking-tight md:text-4xl", children: title }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-base leading-relaxed text-foreground/75 md:text-lg", children: description }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: t(eyebrow) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-3xl font-semibold tracking-tight md:text-4xl", children: t(title) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-base leading-relaxed text-foreground/75 md:text-lg", children: t(description) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Button,
@@ -43269,7 +44202,7 @@ function CtaBand({
           size: "lg",
           className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: GET_STARTED_URL, "data-ocid": "cta.primary_button", children: [
-            "Get Started",
+            t("Get Started"),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
           ] })
         }
@@ -43281,7 +44214,7 @@ function CtaBand({
           size: "lg",
           variant: "outline",
           className: "rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: SIGN_IN_URL, "data-ocid": "cta.secondary_button", children: "Sign In" })
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: SIGN_IN_URL, "data-ocid": "cta.secondary_button", children: t("Sign In") })
         }
       )
     ] })
@@ -43295,6 +44228,7 @@ function ImagePanel({
   className,
   priority = false
 }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "figure",
     {
@@ -43313,7 +44247,7 @@ function ImagePanel({
             className: cn("w-full object-cover", ratio)
           }
         ),
-        caption ? /* @__PURE__ */ jsxRuntimeExports.jsx("figcaption", { className: "border-t border-hairline bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground", children: caption }) : null
+        caption ? /* @__PURE__ */ jsxRuntimeExports.jsx("figcaption", { className: "border-t border-hairline bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground", children: t(caption) }) : null
       ]
     }
   );
@@ -43327,15 +44261,16 @@ function PageHero({
   children,
   className
 }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "section",
     {
       className: cn("bg-canvas pb-16 pt-32 md:pb-24 md:pt-40", className),
       children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "animate-fade-up", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: eyebrow }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl lg:text-6xl", children: title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg", children: description }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: t(eyebrow) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl lg:text-6xl", children: t(title) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg", children: t(description) }),
           children ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-8", children }) : null
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-fade-up", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -43377,6 +44312,7 @@ function SectionHeading({
   align = "left",
   className
 }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
@@ -43386,14 +44322,14 @@ function SectionHeading({
         className
       ),
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: eyebrow }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl", children: title }),
-        description ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-base leading-relaxed text-muted-foreground md:text-lg", children: description }) : null
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: t(eyebrow) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl", children: t(title) }),
+        description ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-4 text-base leading-relaxed text-muted-foreground md:text-lg", children: t(description) }) : null
       ]
     }
   );
 }
-const HERO_IMAGE$2 = {
+const HERO_IMAGE$4 = {
   src: "/assets/generated/ai-governance-clinician-review.dim_1536x1024.jpg",
   alt: "A clinician's hands reviewing a printed structured clinical note on a light oak desk, with a pen beside it and a tablet showing a document outline at the edge of the frame."
 };
@@ -43461,6 +44397,7 @@ const FAQ_ITEMS = [
   }
 ];
 function AiGovernancePage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -43468,7 +44405,7 @@ function AiGovernancePage() {
         eyebrow: "AI governance",
         title: "Clinical AI that can be constrained, examined and stopped.",
         description: "Robi Care is built around a single rule: AI prepares, clinicians decide. Every generated note is a draft until a clinician reviews and approves it — and that review is part of the workflow, not an optional step.",
-        image: HERO_IMAGE$2,
+        image: HERO_IMAGE$4,
         caption: "Review-before-use is the default. The clinician reads the draft, corrects it, and approves it before anything is filed.",
         children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           Button,
@@ -43477,7 +44414,7 @@ function AiGovernancePage() {
             size: "lg",
             className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: GET_STARTED_URL, "data-ocid": "governance.primary_button", children: [
-              "Get Started",
+              t("Get Started"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
             ] })
           }
@@ -43486,9 +44423,11 @@ function AiGovernancePage() {
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { alt: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: "HUMAN AUTHORITY BY DESIGN" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl", children: "AI may assist. The clinician decides." }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg", children: "Robi Care combines clinical workflow support with policy gates, human authorization and traceable evidence through SSOT-AI-GOV." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: t("HUMAN AUTHORITY BY DESIGN") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl", children: t("AI may assist. The clinician decides.") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg", children: t(
+          "Robi Care combines clinical workflow support with policy gates, human authorization and traceable evidence through SSOT-AI-GOV."
+        ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "a",
           {
@@ -43496,7 +44435,7 @@ function AiGovernancePage() {
             className: "btn-primary",
             "data-ocid": "governance.opening_button",
             children: [
-              "See the governance architecture",
+              t("See the governance architecture"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
             ]
           }
@@ -43504,12 +44443,16 @@ function AiGovernancePage() {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-6 sm:grid-cols-2 lg:grid-cols-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-6 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: "Fail-closed" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "Restricted actions are denied when authorization, required evidence or governance services are unavailable." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: t("Fail-closed") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Restricted actions are denied when authorization, required evidence or governance services are unavailable."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-6 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: "Review first" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "Draft clinical content remains visibly unapproved until an authorized professional signs off." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: t("Review first") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Draft clinical content remains visibly unapproved until an authorized professional signs off."
+          ) })
         ] })
       ] })
     ] }) }),
@@ -43529,8 +44472,8 @@ function AiGovernancePage() {
           className: "flex h-full flex-col rounded-xl border-hairline bg-card p-6 shadow-subtle md:p-8",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-muted text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(principle.icon, { className: "size-5", "aria-hidden": "true" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-lg font-semibold tracking-tight text-foreground md:text-xl", children: principle.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground md:text-base", children: principle.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-lg font-semibold tracking-tight text-foreground md:text-xl", children: t(principle.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground md:text-base", children: t(principle.description) })
           ]
         },
         principle.title
@@ -43562,7 +44505,7 @@ function AiGovernancePage() {
                     className: "mt-2 size-2 shrink-0 rounded-full bg-primary"
                   }
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-base leading-relaxed text-foreground", children: principle })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-base leading-relaxed text-foreground", children: t(principle) })
               ]
             },
             principle
@@ -43585,7 +44528,7 @@ function AiGovernancePage() {
         {
           "data-ocid": "governance.failsafe_note",
           className: "mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground",
-          children: FAIL_SAFE_NOTE
+          children: t(FAIL_SAFE_NOTE)
         }
       )
     ] }),
@@ -43609,16 +44552,22 @@ function AiGovernancePage() {
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "mt-10 space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Policy outcomes are visible" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Each decision shows which policy applied and whether the action proceeded, required approval, or was denied." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Policy outcomes are visible") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Each decision shows which policy applied and whether the action proceeded, required approval, or was denied."
+            ) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Exceptions are reviewable" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Denials and approval requests are surfaced for review rather than silently dropped." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Exceptions are reviewable") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Denials and approval requests are surfaced for review rather than silently dropped."
+            ) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Controls can be suspended" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Administrators can stop workflows, models, integrations or user privileges when oversight requires it." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Controls can be suspended") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Administrators can stop workflows, models, integrations or user privileges when oversight requires it."
+            ) })
           ] })
         ] })
       ] })
@@ -43643,16 +44592,22 @@ function AiGovernancePage() {
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "mt-10 space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "The system drafts, the clinician decides" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Robi Care organises what was said into a structured note. It does not diagnose, prescribe, or act." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("The system drafts, the clinician decides") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Robi Care organises what was said into a structured note. It does not diagnose, prescribe, or act."
+            ) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Approval is the gate to the record" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Nothing generated reaches the patient record without a clinician's explicit approval." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Approval is the gate to the record") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Nothing generated reaches the patient record without a clinician's explicit approval."
+            ) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Corrections are first-class" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Editing a draft is a normal part of the workflow, not a failure state. The clinician's version is the note." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Corrections are first-class") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Editing a draft is a normal part of the workflow, not a failure state. The clinician's version is the note."
+            ) })
           ] })
         ] })
       ] })
@@ -43668,16 +44623,22 @@ function AiGovernancePage() {
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-10 grid gap-6 md:grid-cols-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-6 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: "Purpose-limited processing" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "Captured conversation is used to prepare the clinician's note and for nothing else." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: t("Purpose-limited processing") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Captured conversation is used to prepare the clinician's note and for nothing else."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-6 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: "Clinic-controlled policy" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "Retention and access follow the clinic's own policies, applied to the documentation workflow." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: t("Clinic-controlled policy") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Retention and access follow the clinic's own policies, applied to the documentation workflow."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-6 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: "Deployment specifics" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "Hosting arrangements and certifications are [certification/region to be confirmed] and are agreed with each clinic." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-foreground", children: t("Deployment specifics") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Hosting arrangements and certifications are [certification/region to be confirmed] and are agreed with each clinic."
+          ) })
         ] })
       ] })
     ] }),
@@ -44235,23 +45196,24 @@ const EMPTY_DRAFT = {
   message: ""
 };
 const FIELD_CLASS$2 = "border-hairline bg-card text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/40";
-function validate(draft) {
+function validate(draft, t) {
   const errors = {};
-  if (!draft.name.trim()) errors.name = "Please enter your name.";
+  if (!draft.name.trim()) errors.name = t("Please enter your name.");
   if (!draft.email.trim()) {
-    errors.email = "Please enter your email address.";
+    errors.email = t("Please enter your email address.");
   } else if (!EMAIL_PATTERN$1.test(draft.email.trim())) {
-    errors.email = "Please enter a valid email address.";
+    errors.email = t("Please enter a valid email address.");
   }
   if (!draft.organisation.trim()) {
-    errors.organisation = "Please enter your organisation.";
+    errors.organisation = t("Please enter your organisation.");
   }
   if (!draft.message.trim()) {
-    errors.message = "Please tell us how we can help.";
+    errors.message = t("Please tell us how we can help.");
   }
   return errors;
 }
 function ContactForm() {
+  const { t } = useTranslation();
   const { actor } = useActor(createActor);
   const [draft, setDraft] = reactExports.useState(EMPTY_DRAFT);
   const [errors, setErrors] = reactExports.useState({});
@@ -44280,7 +45242,7 @@ function ContactForm() {
   }
   function handleSubmit(event) {
     event.preventDefault();
-    const nextErrors = validate(draft);
+    const nextErrors = validate(draft, t);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
     const captured = draft;
@@ -44316,8 +45278,10 @@ function ContactForm() {
         className: "rounded-xl border-hairline bg-card p-8 shadow-subtle",
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex h-12 w-12 items-center justify-center rounded-full bg-primary/15", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheck, { "aria-hidden": "true", className: "h-6 w-6 text-primary" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-xl font-semibold text-foreground", children: "Thank you — your enquiry has been sent" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "Your message has reached the Robi Care team at hello@tmu.ai. We usually respond within one business day." }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-xl font-semibold text-foreground", children: t("Thank you — your enquiry has been sent") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Your message has reached the Robi Care team at hello@tmu.ai. We usually respond within one business day."
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
             {
@@ -44326,7 +45290,7 @@ function ContactForm() {
               className: "mt-6 rounded-full border border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
               "data-ocid": "contact.send_another_button",
               onClick: () => setSubmitted(false),
-              children: "Send another enquiry"
+              children: t("Send another enquiry")
             }
           )
         ]
@@ -44343,7 +45307,7 @@ function ContactForm() {
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-5 sm:grid-cols-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-name", className: "text-foreground", children: "Name" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-name", className: "text-foreground", children: t("Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -44361,7 +45325,7 @@ function ContactForm() {
             fieldError("name")
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-email", className: "text-foreground", children: "Email" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-email", className: "text-foreground", children: t("Email") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -44381,7 +45345,7 @@ function ContactForm() {
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-organisation", className: "text-foreground", children: "Organisation" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-organisation", className: "text-foreground", children: t("Organisation") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
             {
@@ -44399,7 +45363,7 @@ function ContactForm() {
           fieldError("organisation")
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-message", className: "text-foreground", children: "Message" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "contact-message", className: "text-foreground", children: t("Message") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Textarea,
             {
@@ -44423,7 +45387,9 @@ function ContactForm() {
             className: "mt-5 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { "aria-hidden": "true", className: "mt-0.5 h-4 w-4 shrink-0" }),
-              "We could not send your enquiry just now. Please try again, or email hello@tmu.ai directly."
+              t(
+                "We could not send your enquiry just now. Please try again, or email hello@tmu.ai directly."
+              )
             ]
           }
         ) : null,
@@ -44437,9 +45403,9 @@ function ContactForm() {
             "data-ocid": "contact.submit_button",
             children: mutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { "aria-hidden": "true", className: "animate-spin" }),
-              "Sending…"
+              t("Sending…")
             ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              "Send enquiry",
+              t("Send enquiry"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { "aria-hidden": "true" })
             ] })
           }
@@ -44469,6 +45435,7 @@ const DETAILS = [
   }
 ];
 function ContactPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -44507,14 +45474,224 @@ function ContactPage() {
                 className: "h-5 w-5 text-primary"
               }
             ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-4 text-base font-semibold text-foreground", children: detail.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm font-medium text-foreground", children: detail.body }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: detail.note })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-4 text-base font-semibold text-foreground", children: t(detail.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm font-medium text-foreground", children: t(detail.body) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(detail.note) })
           ]
         },
         detail.title
       )) })
     ] }) })
+  ] });
+}
+const HERO_IMAGE$3 = {
+  src: "/assets/generated/hero-clinical-room.dim_1536x1024.jpg",
+  alt: "A clinician in a white coat reviewing patient notes on a tablet at a light oak desk in a bright, uncluttered consultation room."
+};
+const COOKIE_CATEGORIES = [
+  {
+    id: "essential",
+    title: "Strictly necessary cookies",
+    description: "These cookies are required for the site to function, including security, session management, and remembering your language preference. They cannot be switched off.",
+    icon: ShieldCheck
+  },
+  {
+    id: "preferences",
+    title: "Preference cookies",
+    description: "These cookies remember choices you make, such as your selected language, so the site behaves consistently on your return visits.",
+    icon: Settings2
+  },
+  {
+    id: "analytics",
+    title: "Analytics cookies",
+    description: "These cookies help us understand how the site is used so we can improve it. They are only set where analytics is enabled for the deployment.",
+    icon: ChartColumn
+  }
+];
+function CookieNoticePage() {
+  const { t } = useTranslation();
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHero,
+      {
+        eyebrow: "Cookie Notice",
+        title: "How this site uses cookies",
+        description: "This notice explains what cookies are, which cookies this site uses, and how you can manage them. It applies to the Robi Care website and is available in both languages.",
+        image: HERO_IMAGE$3,
+        caption: "We use cookies to keep the site secure, remember your language preference, and understand how the site is used."
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { id: "cookie-categories", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SectionHeading,
+        {
+          eyebrow: "What we use",
+          title: "The cookies this site uses",
+          description: "Cookies are small text files stored on your device. We group them by purpose so you can see exactly what each one does."
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-14 grid gap-6 md:grid-cols-3", children: COOKIE_CATEGORIES.map((category, index2) => {
+        const Icon2 = category.icon;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "article",
+          {
+            "data-ocid": `cookie.category_card.${index2 + 1}`,
+            className: "flex h-full flex-col gap-5 rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-lg bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(category.title) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(category.description) })
+              ] })
+            ]
+          },
+          category.id
+        );
+      }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "managing-cookies", alt: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SectionHeading,
+        {
+          eyebrow: "Managing cookies",
+          title: "You are in control of your cookies",
+          description: "You can manage or delete cookies through your browser settings at any time. Blocking strictly necessary cookies may affect how the site works."
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-l-2 border-primary/30 pl-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Browser settings") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Most browsers let you view, manage, and delete cookies. The exact steps depend on your browser and are described in its help pages."
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-l-2 border-primary/30 pl-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Language preference") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Your language choice is stored so the site opens in the language you selected on your return visits. Clearing cookies resets it to English."
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-l-2 border-primary/30 pl-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Questions about this notice") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+            "If you have questions about how this site uses cookies, contact the Robi Care team at hello@tmu.ai."
+          ) })
+        ] })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      CtaBand,
+      {
+        eyebrow: "Cookie Notice",
+        title: "Questions about privacy and data handling?",
+        description: "Talk to the team about how cookies, data handling, and clinical governance work in your deployment."
+      }
+    )
+  ] });
+}
+const HERO_IMAGE$2 = {
+  src: "/assets/generated/hero-clinical-room.dim_1536x1024.jpg",
+  alt: "A clinician in a white coat reviewing patient notes on a tablet at a light oak desk in a bright, uncluttered consultation room."
+};
+const DISCLAIMER_POINTS = [
+  {
+    id: "clinician-decides",
+    title: "The clinician decides",
+    description: "Robi Care prepares information for professional review. It does not diagnose, prescribe, or act, and it does not replace clinical judgment. A qualified clinician reviews and approves all clinical content before it is used.",
+    icon: UserCheck
+  },
+  {
+    id: "review-before-use",
+    title: "Review before use",
+    description: "Every generated note is a draft until a clinician reviews and approves it. Nothing generated reaches the patient record without that explicit human sign-off.",
+    icon: ClipboardCheck
+  },
+  {
+    id: "not-a-medical-device",
+    title: "Not a medical device",
+    description: "Robi Care is a documentation and communication aid. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or condition.",
+    icon: ShieldCheck
+  },
+  {
+    id: "not-an-emergency-service",
+    title: "Not an emergency service",
+    description: "Robi Care is not an emergency service. In an emergency, contact the applicable local emergency service immediately.",
+    icon: TriangleAlert
+  }
+];
+function HealthcareDisclaimerPage() {
+  const { t } = useTranslation();
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHero,
+      {
+        eyebrow: "Healthcare and clinical disclaimer",
+        title: "Clinical safety boundaries, stated plainly",
+        description: "Robi Care is an AI-assisted documentation and communication aid for healthcare professionals. It prepares information for professional review; it does not replace clinical judgment, and it is not an emergency service.",
+        image: HERO_IMAGE$2,
+        caption: "The clinician remains responsible for every clinical decision and for verifying, correcting, and approving all clinical documentation before it is used."
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { id: "clinical-disclaimer", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SectionHeading,
+        {
+          eyebrow: "Clinical disclaimer",
+          title: "What Robi Care is, and what it is not",
+          description: "These statements describe the clinical safety boundaries of the service. They apply to every deployment of Robi Care on the TMU · TeleMeetUp Enablement Platform."
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-14 grid gap-6 md:grid-cols-2", children: DISCLAIMER_POINTS.map((point, index2) => {
+        const Icon2 = point.icon;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "article",
+          {
+            "data-ocid": `disclaimer.point_card.${index2 + 1}`,
+            className: "flex h-full gap-5 rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(point.title) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(point.description) })
+              ] })
+            ]
+          },
+          point.id
+        );
+      }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "clinician-responsibility", alt: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SectionHeading,
+        {
+          eyebrow: "Clinician responsibility",
+          title: "The clinician remains the decision-maker",
+          description: "Robi Care assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off."
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-l-2 border-primary/30 pl-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("AI may assist. The clinician decides.") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+            "The service assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off."
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-l-2 border-primary/30 pl-5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Not an emergency service") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Not an emergency service. In an emergency, contact the applicable local emergency service."
+          ) })
+        ] })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      CtaBand,
+      {
+        eyebrow: "Clinical disclaimer",
+        title: "Review the clinical safety model with us",
+        description: "Talk to the team about how review-before-use, clinician control, and data handling would work in your clinic."
+      }
+    )
   ] });
 }
 const AUDIENCE_ICONS = {
@@ -44525,6 +45702,7 @@ const AUDIENCE_ICONS = {
   building: Building2
 };
 function AudienceSection() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { id: "audiences", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       SectionHeading,
@@ -44543,8 +45721,8 @@ function AudienceSection() {
           className: "group flex flex-col rounded-xl border-hairline bg-card p-6 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { "aria-hidden": "true", className: "size-5" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-base font-bold uppercase leading-snug tracking-tight text-foreground", children: audience.label }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: audience.value })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-base font-bold uppercase leading-snug tracking-tight text-foreground", children: t(audience.label) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(audience.value) })
           ]
         },
         audience.id
@@ -44557,7 +45735,7 @@ function AudienceSection() {
         className: "mt-10 flex items-start gap-4 rounded-xl border border-primary/40 bg-primary/10 p-6 md:items-center",
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { "aria-hidden": "true", className: "size-5" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium leading-relaxed text-foreground md:text-base", children: HOME_SAFETY_BANNER })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium leading-relaxed text-foreground md:text-base", children: t(HOME_SAFETY_BANNER) })
         ]
       }
     )
@@ -44570,6 +45748,7 @@ const GUARANTEES = [
   "Clinicians can edit, reject, or rewrite any part of the output."
 ];
 function ClinicianControl() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "clinician-control", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -44582,7 +45761,7 @@ function ClinicianControl() {
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-8 space-y-4", children: GUARANTEES.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { "aria-hidden": "true", className: "size-3" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm leading-relaxed text-foreground/85", children: item })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm leading-relaxed text-foreground/85", children: t(item) })
       ] }, item)) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -44601,6 +45780,7 @@ const CTA_STYLES = {
   ghost: "inline-flex items-center justify-center gap-2 rounded-full bg-transparent px-6 py-3 font-body text-sm font-bold uppercase tracking-[0.12em] text-primary underline-offset-4 transition-smooth hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 };
 function HomeHero() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "section",
     {
@@ -44628,9 +45808,9 @@ function HomeHero() {
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow mb-4", children: HOME_HERO_COPY.eyebrow }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-4xl font-bold uppercase leading-[1.02] tracking-tight text-foreground md:text-5xl lg:text-[2.75rem]", children: HOME_HERO_COPY.headline }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-md text-base leading-relaxed text-foreground/85 md:text-lg", children: HOME_HERO_COPY.supporting }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow mb-4", children: t(HOME_HERO_COPY.eyebrow) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-4xl font-bold uppercase leading-[1.02] tracking-tight text-foreground md:text-5xl lg:text-[2.75rem]", children: t(HOME_HERO_COPY.headline) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-md text-base leading-relaxed text-foreground/85 md:text-lg", children: t(HOME_HERO_COPY.supporting) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-8 flex flex-wrap gap-3", children: HOME_HERO_CTAS.map((cta) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
               Link,
               {
@@ -44641,7 +45821,7 @@ function HomeHero() {
                   CTA_STYLES[cta.variant]
                 ),
                 children: [
-                  cta.label,
+                  t(cta.label),
                   cta.variant === "primary" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true", className: "size-4" }) : null
                 ]
               },
@@ -44674,6 +45854,7 @@ const STEPS$1 = [
   }
 ];
 function HowItWorks() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { id: "how-it-works", alt: true, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       SectionHeading,
@@ -44695,8 +45876,8 @@ function HowItWorks() {
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { "aria-hidden": "true", className: "size-5" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-xs font-bold tracking-[0.2em] text-primary", children: item.step })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-6 text-lg font-bold uppercase tracking-tight text-foreground", children: item.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: item.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-6 text-lg font-bold uppercase tracking-tight text-foreground", children: t(item.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(item.description) })
           ]
         },
         item.step
@@ -44722,6 +45903,7 @@ const PILLARS = [
   }
 ];
 function PlatformProvenance() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { id: "platform", alt: true, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       SectionHeading,
@@ -44739,14 +45921,14 @@ function PlatformProvenance() {
           className: "rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { "aria-hidden": "true", className: "size-5" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-6 text-lg font-bold uppercase tracking-tight text-foreground", children: pillar.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: pillar.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-6 text-lg font-bold uppercase tracking-tight text-foreground", children: t(pillar.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(pillar.description) })
           ]
         },
         pillar.title
       );
     }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-10 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground", children: PROVENANCE_LINE })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-10 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground", children: t(PROVENANCE_LINE) })
   ] });
 }
 function HomePage() {
@@ -44793,6 +45975,7 @@ function ComparisonCard({
   title,
   items
 }) {
+  const { t } = useTranslation();
   const isAfter = tone === "after";
   const Icon2 = isAfter ? Check : X;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -44811,10 +45994,10 @@ function ComparisonCard({
               "text-xs font-bold uppercase tracking-[0.18em]",
               isAfter ? "text-primary" : "text-muted-foreground"
             ),
-            children: eyebrow
+            children: t(eyebrow)
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-3 text-xl font-semibold tracking-tight text-foreground md:text-2xl", children: title }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-3 text-xl font-semibold tracking-tight text-foreground md:text-2xl", children: t(title) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-6 space-y-4", children: items.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "span",
@@ -44827,8 +46010,8 @@ function ComparisonCard({
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "min-w-0", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-sm font-semibold text-foreground", children: item.label }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mt-1 block text-sm leading-relaxed text-muted-foreground", children: item.detail })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-sm font-semibold text-foreground", children: t(item.label) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mt-1 block text-sm leading-relaxed text-muted-foreground", children: t(item.detail) })
           ] })
         ] }, item.label)) })
       ]
@@ -44865,6 +46048,7 @@ const BENEFITS = [
 ];
 function TmuKlServiceSection() {
   const [isPlaying, setIsPlaying] = reactExports.useState(false);
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { id: "tmu-kl-service", alt: true, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       SectionHeading,
@@ -44880,7 +46064,7 @@ function TmuKlServiceSection() {
           "iframe",
           {
             src: `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0`,
-            title: VIDEO_TITLE,
+            title: t(VIDEO_TITLE),
             allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
             allowFullScreen: true,
             className: "absolute inset-0 size-full border-0"
@@ -44890,7 +46074,7 @@ function TmuKlServiceSection() {
           {
             type: "button",
             onClick: () => setIsPlaying(true),
-            "aria-label": `Play video: ${VIDEO_TITLE}`,
+            "aria-label": `${t("Play video:")} ${t(VIDEO_TITLE)}`,
             "data-ocid": "keyboard.video.play_button",
             className: "group absolute inset-0 flex size-full items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             children: [
@@ -44898,7 +46082,7 @@ function TmuKlServiceSection() {
                 "img",
                 {
                   src: VIDEO_POSTER.src,
-                  alt: VIDEO_POSTER.alt,
+                  alt: t(VIDEO_POSTER.alt),
                   loading: "lazy",
                   decoding: "async",
                   className: "absolute inset-0 size-full object-cover"
@@ -44915,11 +46099,13 @@ function TmuKlServiceSection() {
             ]
           }
         ) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "border-t border-hairline bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground", children: "The walkthrough plays inline on this page. Nothing is loaded from YouTube until you press play." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "border-t border-hairline bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground", children: t(
+          "The walkthrough plays inline on this page. Nothing is loaded from YouTube until you press play."
+        ) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: "What it changes" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl", children: "Four gains for the clinician" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: t("What it changes") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl", children: t("Four gains for the clinician") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-1", children: BENEFITS.map((benefit, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "li",
           {
@@ -44930,8 +46116,8 @@ function TmuKlServiceSection() {
             ),
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(benefit.icon, { className: "size-5", "aria-hidden": "true" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "mt-5 text-base font-semibold tracking-tight text-foreground", children: benefit.title }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: benefit.description })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "mt-5 text-base font-semibold tracking-tight text-foreground", children: t(benefit.title) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(benefit.description) })
             ]
           },
           benefit.title
@@ -44939,8 +46125,10 @@ function TmuKlServiceSection() {
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-12 max-w-3xl border-l-2 border-primary/30 pl-5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "AI may assist. The clinician decides." }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: "The service assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off." })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("AI may assist. The clinician decides.") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(
+        "The service assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off."
+      ) })
     ] })
   ] });
 }
@@ -44954,6 +46142,7 @@ const WORKFLOW_STEPS$1 = [
   "Authorized Record"
 ];
 function WorkflowDiagram({ className }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "ol",
     {
@@ -44976,7 +46165,7 @@ function WorkflowDiagram({ className }) {
                   className: "size-1.5 shrink-0 rounded-full bg-primary"
                 }
               ),
-              step
+              t(step)
             ]
           }
         ),
@@ -45073,6 +46262,7 @@ const PROOF_POINTS = [
   }
 ];
 function KeyboardLiberationPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -45089,7 +46279,7 @@ function KeyboardLiberationPage() {
             size: "lg",
             className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: GET_STARTED_URL, "data-ocid": "keyboard.primary_button", children: [
-              "Get Started",
+              t("Get Started"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
             ] })
           }
@@ -45105,7 +46295,9 @@ function KeyboardLiberationPage() {
             title: "Let clinicians face patients again."
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 text-base leading-relaxed text-muted-foreground md:text-lg", children: "Clinical documentation is indispensable, but the keyboard should not stand between a healthcare professional and the person seeking care. Robi Care uses consent-based, AI-assisted, multilingual voice documentation to transform authorized clinical conversations into reviewable drafts, summaries and structured records — just speak to it in your own language. The clinician remains responsible for verifying, correcting and approving the resulting clinical documentation — this human sign-off is a safety control, not an inconvenience." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 text-base leading-relaxed text-muted-foreground md:text-lg", children: t(
+          "Clinical documentation is indispensable, but the keyboard should not stand between a healthcare professional and the person seeking care. Robi Care uses consent-based, AI-assisted, multilingual voice documentation to transform authorized clinical conversations into reviewable drafts, summaries and structured records — just speak to it in your own language. The clinician remains responsible for verifying, correcting and approving the resulting clinical documentation — this human sign-off is a safety control, not an inconvenience."
+        ) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         ImagePanel,
@@ -45128,7 +46320,9 @@ function KeyboardLiberationPage() {
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(WorkflowDiagram, { className: "mt-12" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mx-auto mt-10 max-w-3xl text-sm leading-relaxed text-muted-foreground", children: "This approach reflects the broader case made by Dr. Eric Topol for AI-assisted, ambient clinical documentation that frees physicians to focus on patients rather than data entry. Robi Care applies this thinking within a governed, consent-based workflow. This page does not imply that Dr. Topol endorses Robi Care." })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mx-auto mt-10 max-w-3xl text-sm leading-relaxed text-muted-foreground", children: t(
+        "This approach reflects the broader case made by Dr. Eric Topol for AI-assisted, ambient clinical documentation that frees physicians to focus on patients rather than data entry. Robi Care applies this thinking within a governed, consent-based workflow. This page does not imply that Dr. Topol endorses Robi Care."
+      ) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Section, { alt: true, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45165,11 +46359,12 @@ function KeyboardLiberationPage() {
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(step.icon, { className: "size-5", "aria-hidden": "true" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-5 font-mono text-xs uppercase tracking-[0.18em] text-primary", children: [
-              "Step ",
+              t("Step"),
+              " ",
               index2 + 1
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-2 text-lg font-semibold tracking-tight text-foreground", children: step.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: step.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-2 text-lg font-semibold tracking-tight text-foreground", children: t(step.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(step.description) })
           ]
         },
         step.title
@@ -45190,10 +46385,10 @@ function KeyboardLiberationPage() {
           {
             className: "border-l-2 border-primary/30 pl-5",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-sm font-semibold uppercase tracking-[0.14em] text-primary", children: point.value }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-sm font-semibold uppercase tracking-[0.14em] text-primary", children: t(point.value) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("dd", { className: "mt-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-base font-semibold text-foreground", children: point.label }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mt-1 block text-sm leading-relaxed text-muted-foreground", children: point.detail })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-base font-semibold text-foreground", children: t(point.label) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "mt-1 block text-sm leading-relaxed text-muted-foreground", children: t(point.detail) })
               ] })
             ]
           },
@@ -45219,6 +46414,7 @@ function KeyboardLiberationPage() {
   ] });
 }
 function PartnerModels({ models, className }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "div",
     {
@@ -45233,9 +46429,9 @@ function PartnerModels({ models, className }) {
             "data-ocid": `partnerships.model_card.${index2 + 1}`,
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-lg bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-5 text-xs font-bold uppercase tracking-[0.16em] text-primary", children: model.audience }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-2 text-xl font-semibold text-foreground", children: model.title }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: model.description }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-5 text-xs font-bold uppercase tracking-[0.16em] text-primary", children: t(model.audience) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-2 text-xl font-semibold text-foreground", children: t(model.title) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(model.description) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-6 space-y-3 border-t border-hairline pt-6", children: model.points.map((point) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "li",
                 {
@@ -45248,7 +46444,7 @@ function PartnerModels({ models, className }) {
                         "aria-hidden": "true"
                       }
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: point })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: t(point) })
                   ]
                 },
                 point
@@ -45373,6 +46569,7 @@ const PARTNER_STEPS = [
   }
 ];
 function PartnershipsPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -45393,7 +46590,7 @@ function PartnershipsPage() {
               size: "lg",
               className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "/contact", "data-ocid": "partnerships.primary_button", children: [
-                "Contact for partnership",
+                t("Contact for partnership"),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
               ] })
             }
@@ -45405,7 +46602,7 @@ function PartnershipsPage() {
               size: "lg",
               variant: "outline",
               className: "rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: GET_STARTED_URL, "data-ocid": "partnerships.secondary_button", children: "Get Started" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: GET_STARTED_URL, "data-ocid": "partnerships.secondary_button", children: t("Get Started") })
             }
           )
         ] })
@@ -45419,7 +46616,9 @@ function PartnershipsPage() {
           title: "How the model is structured"
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground md:text-lg", children: "Robi Care is deployed through Public-Private Partnerships (PPP) with private enterprise, NGOs and local or national government in each country. Ecocarrier Inc. provides Robi Care, the TMU Enablement Platform and the SAAAS implementation and technical support." }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground md:text-lg", children: t(
+        "Robi Care is deployed through Public-Private Partnerships (PPP) with private enterprise, NGOs and local or national government in each country. Ecocarrier Inc. provides Robi Care, the TMU Enablement Platform and the SAAAS implementation and technical support."
+      ) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         ImagePanel,
         {
@@ -45435,14 +46634,16 @@ function PartnershipsPage() {
           className: "w-full table-fixed border-collapse text-left",
           "data-ocid": "partnerships.ppp_table",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("caption", { className: "sr-only", children: "Participants in the Robi Care Public-Private Partnership model and their roles" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("caption", { className: "sr-only", children: t(
+              "Participants in the Robi Care Public-Private Partnership model and their roles"
+            ) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-section-alt", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "th",
                 {
                   scope: "col",
                   className: "w-[38%] px-4 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-foreground sm:px-6",
-                  children: "Participant"
+                  children: t("Participant")
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45450,7 +46651,7 @@ function PartnershipsPage() {
                 {
                   scope: "col",
                   className: "px-4 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-foreground sm:px-6",
-                  children: "Role"
+                  children: t("Role")
                 }
               )
             ] }) }),
@@ -45465,10 +46666,10 @@ function PartnershipsPage() {
                     {
                       scope: "row",
                       className: "break-words px-4 py-4 text-sm font-semibold text-foreground sm:px-6",
-                      children: row.participant
+                      children: t(row.participant)
                     }
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "break-words px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-6", children: row.role })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "break-words px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-6", children: t(row.role) })
                 ]
               },
               row.id
@@ -45507,8 +46708,8 @@ function PartnershipsPage() {
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: capability.title }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: capability.description })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(capability.title) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(capability.description) })
               ] })
             ]
           },
@@ -45532,8 +46733,8 @@ function PartnershipsPage() {
           "data-ocid": `partnerships.step_card.${index2 + 1}`,
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-sm font-semibold text-primary", children: item.step }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-4 text-lg font-semibold text-foreground", children: item.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: item.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-4 text-lg font-semibold text-foreground", children: t(item.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(item.description) })
           ]
         },
         item.id
@@ -45565,7 +46766,7 @@ function PartnershipsPage() {
               size: "lg",
               className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "/contact", "data-ocid": "partnerships.contact_button", children: [
-                "Contact for partnership",
+                t("Contact for partnership"),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
               ] })
             }
@@ -45582,7 +46783,7 @@ function PartnershipsPage() {
                 {
                   href: "/sovereign-deployment",
                   "data-ocid": "partnerships.deployment_button",
-                  children: "Deployment model"
+                  children: t("Deployment model")
                 }
               )
             }
@@ -45600,6 +46801,7 @@ function PartnershipsPage() {
   ] });
 }
 function PricingTierCard({ tier, index: index2 }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "article",
     {
@@ -45612,12 +46814,12 @@ function PricingTierCard({ tier, index: index2 }) {
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-foreground", children: tier.name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: tier.tagline })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(tier.tagline) })
           ] }),
-          tier.featured ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "shrink-0 rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-primary", children: "Most popular" }) : null
+          tier.featured ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "shrink-0 rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-primary", children: t("Most popular") }) : null
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 rounded-lg border-hairline bg-muted px-5 py-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground", children: "Transcription allowance" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground", children: t("Transcription allowance") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 font-display text-2xl font-semibold text-foreground", children: tier.transcriptionHours })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-6 flex-1 space-y-4", children: tier.lineItems.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -45634,9 +46836,9 @@ function PricingTierCard({ tier, index: index2 }) {
                       className: "h-4 w-4 shrink-0 text-primary"
                     }
                   ),
-                  item.label
+                  t(item.label)
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 pl-6 text-xs leading-relaxed text-muted-foreground", children: item.detail })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 pl-6 text-xs leading-relaxed text-muted-foreground", children: t(item.detail) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "shrink-0 font-mono text-sm font-medium text-foreground", children: item.price })
             ]
@@ -45644,7 +46846,7 @@ function PricingTierCard({ tier, index: index2 }) {
           item.label
         )) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 flex items-baseline justify-between border-t border-hairline pt-5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-muted-foreground", children: "Monthly total" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-muted-foreground", children: t("Monthly total") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-2xl font-semibold text-foreground", children: tier.total })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45663,7 +46865,7 @@ function PricingTierCard({ tier, index: index2 }) {
                 href: GET_STARTED_URL,
                 "data-ocid": `pricing.get_started_button.${index2 + 1}`,
                 children: [
-                  "Get Started",
+                  t("Get Started"),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
                 ]
               }
@@ -45713,13 +46915,16 @@ const USAGE_ROWS = [
   }
 ];
 function PricingUsageTable() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "div",
     {
       "data-ocid": "pricing.usage_table",
       className: "mt-14 overflow-x-auto rounded-xl border-hairline bg-canvas shadow-subtle",
       children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-[46rem] border-collapse text-left text-sm text-foreground", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("caption", { className: "sr-only", children: "Monthly usage breakdown by tier, with unit counts and US$ amounts" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("caption", { className: "sr-only", children: t(
+          "Monthly usage breakdown by tier, with unit counts and US$ amounts"
+        ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-border", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45727,7 +46932,7 @@ function PricingUsageTable() {
               {
                 scope: "col",
                 className: "w-[28%] px-5 py-5 align-bottom text-xs font-bold uppercase tracking-[0.14em] text-foreground",
-                children: "Units"
+                children: t("Units")
               }
             ),
             TIER_COLUMNS.map((tier) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -45750,7 +46955,7 @@ function PricingUsageTable() {
               {
                 scope: "col",
                 className: "px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-foreground",
-                children: "Number of Units"
+                children: t("Number of Units")
               }
             ),
             TIER_COLUMNS.map((tier) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -45758,7 +46963,7 @@ function PricingUsageTable() {
               {
                 scope: "col",
                 className: "px-5 py-3 text-right text-xs font-bold uppercase tracking-[0.14em] text-foreground",
-                children: "US$"
+                children: t("US$")
               },
               tier.id
             ))
@@ -45775,7 +46980,7 @@ function PricingUsageTable() {
                 {
                   scope: "row",
                   className: "px-5 py-5 text-left align-top font-medium text-foreground",
-                  children: row.label
+                  children: t(row.label)
                 }
               ),
               row.cells.map((cell, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -45887,6 +47092,7 @@ const INCLUDED = [
   }
 ];
 function PricingPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -45918,9 +47124,11 @@ function PricingPage() {
           "data-ocid": "pricing.rates_note",
           className: "mt-10 rounded-lg border-hairline bg-muted px-5 py-4 text-sm leading-relaxed text-muted-foreground",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold uppercase tracking-[0.12em] text-primary", children: "Base unit rates:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold uppercase tracking-[0.12em] text-primary", children: t("Base unit rates:") }),
             " ",
-            "Speech-to-Text Transcription $0.074/minute · Access to ChatGPT $0.02 per 1,000 tokens · Audio Recording $5.25/GB per month. Monthly totals are the sum of the metered components shown for each tier."
+            t(
+              "Speech-to-Text Transcription $0.074/minute · Access to ChatGPT $0.02 per 1,000 tokens · Audio Recording $5.25/GB per month. Monthly totals are the sum of the metered components shown for each tier."
+            )
           ]
         }
       )
@@ -45939,8 +47147,8 @@ function PricingPage() {
         {
           className: "rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:shadow-elevated",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: item.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: item.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(item.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(item.description) })
           ]
         },
         item.title
@@ -46124,6 +47332,7 @@ function AccountStep({
   onChange,
   onContinue
 }) {
+  const { t } = useTranslation();
   const [submitted, setSubmitted] = reactExports.useState(false);
   function handleSubmit(event) {
     event.preventDefault();
@@ -46138,7 +47347,7 @@ function AccountStep({
       className: "mt-2 flex items-center gap-1.5 text-sm text-destructive",
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { "aria-hidden": "true", className: "h-4 w-4 shrink-0" }),
-        errors[field]
+        t(errors[field])
       ]
     }
   ) : null;
@@ -46151,12 +47360,12 @@ function AccountStep({
       "data-ocid": "signup.account_form",
       className: "rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8",
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: ACCOUNT_STEP_COPY.eyebrow }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-foreground md:text-3xl", children: ACCOUNT_STEP_COPY.title }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: ACCOUNT_STEP_COPY.description }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: t(ACCOUNT_STEP_COPY.eyebrow) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-foreground md:text-3xl", children: t(ACCOUNT_STEP_COPY.title) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(ACCOUNT_STEP_COPY.description) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-7 space-y-5", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-full-name", className: "text-foreground", children: "Full Name" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-full-name", className: "text-foreground", children: t("Full Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -46174,7 +47383,7 @@ function AccountStep({
             showError("fullName")
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-email", className: "text-foreground", children: "Email Address" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-email", className: "text-foreground", children: t("Email Address") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -46193,7 +47402,7 @@ function AccountStep({
             showError("email")
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-phone", className: "text-foreground", children: "Mobile Phone Number" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-phone", className: "text-foreground", children: t("Mobile Phone Number") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -46220,7 +47429,7 @@ function AccountStep({
             className: "mt-7 w-full rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-accent/90 hover:shadow-elevated sm:w-auto",
             "data-ocid": "signup.continue_button",
             children: [
-              "Continue",
+              t("Continue"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
             ]
           }
@@ -46307,6 +47516,7 @@ function TableCell({ className, ...props }) {
 }
 const FIELD_CLASS = "border-hairline bg-card text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/40";
 function DashboardStep({ fullName, onStartOver }) {
+  const { t } = useTranslation();
   const [role, setRole] = reactExports.useState("");
   const [organisation, setOrganisation] = reactExports.useState("");
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-ocid": "signup.dashboard_panel", className: "space-y-8", children: [
@@ -46323,16 +47533,16 @@ function DashboardStep({ fullName, onStartOver }) {
               className: "mt-0.5 h-4 w-4 shrink-0 text-primary"
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: DASHBOARD_STEP_COPY.previewBanner })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: t(DASHBOARD_STEP_COPY.previewBanner) })
         ]
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-start justify-between gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: DASHBOARD_STEP_COPY.eyebrow }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-foreground md:text-3xl", children: DASHBOARD_STEP_COPY.title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground", children: DASHBOARD_STEP_COPY.description })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: t(DASHBOARD_STEP_COPY.eyebrow) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-foreground md:text-3xl", children: t(DASHBOARD_STEP_COPY.title) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground", children: t(DASHBOARD_STEP_COPY.description) })
         ] }),
         fullName ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "span",
@@ -46347,11 +47557,11 @@ function DashboardStep({ fullName, onStartOver }) {
         ) : null
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-8 border-t border-hairline pt-8", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: DASHBOARD_STEP_COPY.personalInfoTitle }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: DASHBOARD_STEP_COPY.personalInfoDescription }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(DASHBOARD_STEP_COPY.personalInfoTitle) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground", children: t(DASHBOARD_STEP_COPY.personalInfoDescription) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 grid gap-5 sm:grid-cols-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-role", className: "text-foreground", children: "Professional role / specialty" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-role", className: "text-foreground", children: t("Professional role / specialty") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -46360,15 +47570,15 @@ function DashboardStep({ fullName, onStartOver }) {
                 list: "signup-role-options",
                 value: role,
                 onChange: (event) => setRole(event.target.value),
-                placeholder: "e.g. Emergency Physician",
+                placeholder: t("e.g. Emergency Physician"),
                 className: FIELD_CLASS,
                 "data-ocid": "signup.role_input"
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("datalist", { id: "signup-role-options", children: ROLE_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option }, option)) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("datalist", { id: "signup-role-options", children: ROLE_OPTIONS.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: t(option) }, option)) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-organisation", className: "text-foreground", children: "Organization / practice name" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-organisation", className: "text-foreground", children: t("Organization / practice name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -46377,7 +47587,7 @@ function DashboardStep({ fullName, onStartOver }) {
                 autoComplete: "organization",
                 value: organisation,
                 onChange: (event) => setOrganisation(event.target.value),
-                placeholder: "e.g. Northshore Family Practice",
+                placeholder: t("e.g. Northshore Family Practice"),
                 className: FIELD_CLASS,
                 "data-ocid": "signup.organisation_input"
               }
@@ -46389,7 +47599,7 @@ function DashboardStep({ fullName, onStartOver }) {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex h-10 w-10 items-center justify-center rounded-full bg-primary/15", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TrendingUp, { "aria-hidden": "true", className: "h-5 w-5 text-primary" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: DASHBOARD_STEP_COPY.usageTitle })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(DASHBOARD_STEP_COPY.usageTitle) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("dl", { className: "mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4", children: USAGE_METRICS.map((metric) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "div",
@@ -46397,9 +47607,9 @@ function DashboardStep({ fullName, onStartOver }) {
           "data-ocid": `signup.usage.${metric.id}`,
           className: "rounded-lg border-hairline bg-muted p-5",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground", children: metric.label }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground", children: t(metric.label) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "mt-3 font-display text-2xl font-bold text-foreground", children: metric.value }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "mt-1 text-xs text-muted-foreground", children: metric.detail })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "mt-1 text-xs text-muted-foreground", children: t(metric.detail) })
           ]
         },
         metric.id
@@ -46408,7 +47618,7 @@ function DashboardStep({ fullName, onStartOver }) {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex h-10 w-10 items-center justify-center rounded-full bg-primary/15", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Receipt, { "aria-hidden": "true", className: "h-5 w-5 text-primary" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: DASHBOARD_STEP_COPY.billingTitle })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(DASHBOARD_STEP_COPY.billingTitle) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 flex flex-wrap items-end justify-between gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -46419,7 +47629,7 @@ function DashboardStep({ fullName, onStartOver }) {
             BILLING_SUMMARY.period
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary", children: BILLING_SUMMARY.status })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary", children: t(BILLING_SUMMARY.status) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("dl", { className: "mt-6 space-y-3 border-t border-hairline pt-6", children: [
         BILLING_SUMMARY.lines.map((line) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -46427,27 +47637,27 @@ function DashboardStep({ fullName, onStartOver }) {
           {
             className: "flex items-center justify-between gap-4 text-sm",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-muted-foreground", children: line.label }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-muted-foreground", children: t(line.label) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "font-mono text-foreground", children: line.value })
             ]
           },
           line.id
         )),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4 border-t border-hairline pt-3 text-sm font-semibold", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-foreground", children: BILLING_SUMMARY.totalLabel }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-foreground", children: t(BILLING_SUMMARY.totalLabel) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "font-mono text-primary", children: BILLING_SUMMARY.amount })
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: DASHBOARD_STEP_COPY.invoicesTitle }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(DASHBOARD_STEP_COPY.invoicesTitle) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { "data-ocid": "signup.invoice_table", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-hairline", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-muted-foreground", children: "Invoice" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-muted-foreground", children: "Period" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-muted-foreground", children: "Issued" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right text-muted-foreground", children: "Amount" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right text-muted-foreground", children: "Status" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-muted-foreground", children: t("Invoice") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-muted-foreground", children: t("Period") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-muted-foreground", children: t("Issued") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right text-muted-foreground", children: t("Amount") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right text-muted-foreground", children: t("Status") })
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: INVOICE_ROWS.map((row) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
           TableRow,
@@ -46466,7 +47676,7 @@ function DashboardStep({ fullName, onStartOver }) {
                     "inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em]",
                     row.status === "Paid" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                   ),
-                  children: row.status
+                  children: t(row.status)
                 }
               ) })
             ]
@@ -46488,7 +47698,7 @@ function DashboardStep({ fullName, onStartOver }) {
               className: "mt-0.5 h-4 w-4 shrink-0 text-primary"
             }
           ),
-          DASHBOARD_STEP_COPY.platformNote
+          t(DASHBOARD_STEP_COPY.platformNote)
         ]
       }
     ),
@@ -46504,7 +47714,7 @@ function DashboardStep({ fullName, onStartOver }) {
           "data-ocid": "signup.start_over_button",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCcw, { "aria-hidden": "true" }),
-            "Start over"
+            t("Start over")
           ]
         }
       ),
@@ -46516,7 +47726,7 @@ function DashboardStep({ fullName, onStartOver }) {
           className: "w-full rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-accent/90 hover:shadow-elevated sm:w-auto",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Link, { to: "/", "data-ocid": "signup.return_home_button", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { "aria-hidden": "true" }),
-            "Return home"
+            t("Return home")
           ] })
         }
       )
@@ -46524,11 +47734,12 @@ function DashboardStep({ fullName, onStartOver }) {
   ] });
 }
 function OnboardingSteps({ current }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "ol",
     {
       "data-ocid": "signup.steps",
-      "aria-label": "Sign up progress",
+      "aria-label": t("Sign up progress"),
       className: "flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-0",
       children: SIGNUP_STEPS.map((step, index2) => {
         const isComplete = step.id < current;
@@ -46562,10 +47773,10 @@ function OnboardingSteps({ current }) {
                       "block text-xs font-bold uppercase tracking-[0.16em]",
                       isActive || isComplete ? "text-primary" : "text-muted-foreground"
                     ),
-                    children: step.label
+                    children: t(step.label)
                   }
                 ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block truncate text-xs text-muted-foreground", children: step.description })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block truncate text-xs text-muted-foreground", children: t(step.description) })
               ] }),
               !isLast ? /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "span",
@@ -46837,6 +48048,7 @@ function VerificationStep({
   onVerify,
   onBack
 }) {
+  const { t } = useTranslation();
   const [code, setCode] = reactExports.useState("");
   const [error, setError] = reactExports.useState(null);
   function handleSubmit(event) {
@@ -46855,16 +48067,16 @@ function VerificationStep({
       className: "rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8",
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex h-12 w-12 items-center justify-center rounded-full bg-primary/15", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MailCheck, { "aria-hidden": "true", className: "h-6 w-6 text-primary" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow mt-5", children: VERIFICATION_STEP_COPY.eyebrow }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-foreground md:text-3xl", children: VERIFICATION_STEP_COPY.title }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: VERIFICATION_STEP_COPY.description }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow mt-5", children: t(VERIFICATION_STEP_COPY.eyebrow) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-3 text-2xl font-semibold text-foreground md:text-3xl", children: t(VERIFICATION_STEP_COPY.title) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(VERIFICATION_STEP_COPY.description) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "p",
           {
             "data-ocid": "signup.sent_to_email",
             className: "mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border-hairline bg-muted px-4 py-2 text-sm font-medium text-foreground",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Sent to" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: t("Sent to") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate font-mono text-primary", children: email })
             ]
           }
@@ -46875,7 +48087,7 @@ function VerificationStep({
             {
               htmlFor: "signup-verification-code",
               className: "text-sm font-medium text-foreground",
-              children: "Verification code"
+              children: t("Verification code")
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -46910,7 +48122,7 @@ function VerificationStep({
               id: "signup-code-error",
               "data-ocid": "signup.code_error",
               className: "mt-3 text-sm text-destructive",
-              children: error
+              children: t(error)
             }
           ) : null,
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-4 flex items-start gap-2 text-xs leading-relaxed text-muted-foreground", children: [
@@ -46921,7 +48133,7 @@ function VerificationStep({
                 className: "mt-0.5 h-4 w-4 shrink-0 text-primary"
               }
             ),
-            VERIFICATION_STEP_COPY.kycNote
+            t(VERIFICATION_STEP_COPY.kycNote)
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-7 flex flex-col gap-3 sm:flex-row sm:items-center", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -46932,7 +48144,7 @@ function VerificationStep({
                 className: "w-full rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-accent/90 hover:shadow-elevated sm:w-auto",
                 "data-ocid": "signup.verify_button",
                 children: [
-                  "Verify",
+                  t("Verify"),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
                 ]
               }
@@ -46948,7 +48160,7 @@ function VerificationStep({
                 "data-ocid": "signup.back_button",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { "aria-hidden": "true" }),
-                  "Back to details"
+                  t("Back to details")
                 ]
               }
             )
@@ -46959,6 +48171,7 @@ function VerificationStep({
   );
 }
 function SignUpPage() {
+  const { t } = useTranslation();
   const [step, setStep] = reactExports.useState(1);
   const [draft, setDraft] = reactExports.useState(EMPTY_ACCOUNT_DRAFT);
   const [errors, setErrors] = reactExports.useState({});
@@ -46989,9 +48202,9 @@ function SignUpPage() {
       className: "bg-canvas pb-20 pt-32 md:pb-28 md:pt-40",
       children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "container", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto max-w-3xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: SIGNUP_HEADER.eyebrow }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl", children: SIGNUP_HEADER.title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg", children: SIGNUP_HEADER.description })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow rule-accent inline-block pb-2", children: t(SIGNUP_HEADER.eyebrow) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl", children: t(SIGNUP_HEADER.title) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg", children: t(SIGNUP_HEADER.description) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto mt-12 max-w-3xl", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(OnboardingSteps, { current: step }),
@@ -47021,7 +48234,7 @@ function SignUpPage() {
               }
             ) : null
           ] }),
-          step === 1 ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 text-xs leading-relaxed text-muted-foreground", children: ACCOUNT_STEP_COPY.description }) : null
+          step === 1 ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 text-xs leading-relaxed text-muted-foreground", children: t(ACCOUNT_STEP_COPY.description) }) : null
         ] })
       ] })
     }
@@ -47031,6 +48244,7 @@ function AudienceDetail({
   audience,
   reversed = false
 }) {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "article",
     {
@@ -47048,18 +48262,18 @@ function AudienceDetail({
               audience.image && reversed && "lg:order-2"
             ),
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold uppercase tracking-tight text-foreground md:text-2xl", children: audience.name }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold uppercase tracking-tight text-foreground md:text-2xl", children: t(audience.name) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: "The challenge" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground md:text-base", children: audience.challenge })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: t("The challenge") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground md:text-base", children: t(audience.challenge) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: "How Robi Care helps" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground md:text-base", children: audience.help })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "eyebrow", children: t("How Robi Care helps") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-muted-foreground md:text-base", children: t(audience.help) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 rounded-lg border border-primary/30 bg-deep-green p-5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold uppercase tracking-[0.18em] text-primary", children: "Where human review occurs" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-foreground/85", children: audience.review })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold uppercase tracking-[0.18em] text-primary", children: t("Where human review occurs") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm leading-relaxed text-foreground/85", children: t(audience.review) })
               ] })
             ]
           }
@@ -47082,6 +48296,7 @@ function SolutionCard({
   solution,
   reversed = false
 }) {
+  const { t } = useTranslation();
   const Icon2 = solution.icon;
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "article",
@@ -47098,8 +48313,8 @@ function SolutionCard({
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col justify-center p-8 md:p-10", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { "aria-hidden": "true", className: "size-5" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-6 text-xl font-bold uppercase tracking-tight text-foreground md:text-2xl", children: solution.title }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground md:text-base", children: solution.description }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-6 text-xl font-bold uppercase tracking-tight text-foreground md:text-2xl", children: t(solution.title) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground md:text-base", children: t(solution.description) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-6 space-y-2.5", children: solution.points.map((point) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "li",
                 {
@@ -47112,7 +48327,7 @@ function SolutionCard({
                         className: "mt-2 size-1.5 shrink-0 rounded-full bg-primary"
                       }
                     ),
-                    point
+                    t(point)
                   ]
                 },
                 point
@@ -47146,7 +48361,7 @@ const SOLUTIONS = [
     icon: Mic,
     image: {
       src: "/assets/generated/solution-conversation-capture.dim_1536x1024.jpg",
-      alt: "A clinician speaking with a patient across a light wooden table in a bright consultation room."
+      alt: "A physician attending to a toddler seated on an exam table, with a colleague present."
     }
   },
   {
@@ -47242,6 +48457,7 @@ const AUDIENCES = [
   }
 ];
 function SolutionsPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -47285,16 +48501,22 @@ function SolutionsPage() {
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold uppercase tracking-tight text-foreground", children: "No new clinical process" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "The consultation stays a conversation. Robi Care works in the background and presents its output for review afterwards." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold uppercase tracking-tight text-foreground", children: t("No new clinical process") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "The consultation stays a conversation. Robi Care works in the background and presents its output for review afterwards."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold uppercase tracking-tight text-foreground", children: "Judgement stays clinical" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "Suggestions are drafts. The clinician decides what is accurate, what is relevant, and what belongs in the record." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold uppercase tracking-tight text-foreground", children: t("Judgement stays clinical") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Suggestions are drafts. The clinician decides what is accurate, what is relevant, and what belongs in the record."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold uppercase tracking-tight text-foreground", children: "One platform underneath" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "Robi Care runs on the TMU · TeleMeetUp Enablement Platform, so governance and integrations are shared rather than duplicated." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold uppercase tracking-tight text-foreground", children: t("One platform underneath") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Robi Care runs on the TMU · TeleMeetUp Enablement Platform, so governance and integrations are shared rather than duplicated."
+          ) })
         ] })
       ] })
     ] }) }),
@@ -47339,7 +48561,7 @@ function SolutionsPage() {
             "data-ocid": "solutions.primary_button",
             className: "btn-primary",
             children: [
-              "Get Started",
+              t("Get Started"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true", className: "size-4" })
             ]
           }
@@ -47350,7 +48572,7 @@ function SolutionsPage() {
             href: "/contact",
             "data-ocid": "solutions.secondary_button",
             className: "btn-secondary",
-            children: "Contact us"
+            children: t("Contact us")
           }
         )
       ] })
@@ -47459,6 +48681,7 @@ const DEPLOYMENT_FACTS = [
   }
 ];
 function SovereignDeploymentPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -47479,7 +48702,7 @@ function SovereignDeploymentPage() {
               size: "lg",
               className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: GET_STARTED_URL, "data-ocid": "sovereign.primary_button", children: [
-                "Get Started",
+                t("Get Started"),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
               ] })
             }
@@ -47491,7 +48714,7 @@ function SovereignDeploymentPage() {
               size: "lg",
               variant: "outline",
               className: "rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/contact", "data-ocid": "sovereign.secondary_button", children: "Talk to the team" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/contact", "data-ocid": "sovereign.secondary_button", children: t("Talk to the team") })
             }
           )
         ] })
@@ -47516,8 +48739,8 @@ function SovereignDeploymentPage() {
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 shrink-0 items-center justify-center rounded-lg bg-muted text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: pillar.title }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: pillar.description })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(pillar.title) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(pillar.description) })
               ] })
             ]
           },
@@ -47536,16 +48759,22 @@ function SovereignDeploymentPage() {
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: "The boundary becomes unclear" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "Once content leaves the clinical environment, the provider can no longer describe the processing boundary in terms its own governance process recognises." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t("The boundary becomes unclear") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Once content leaves the clinical environment, the provider can no longer describe the processing boundary in terms its own governance process recognises."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: "Custody is quietly transferred" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "A vendor that stores the record in its own tenancy becomes a second custodian of clinical data, which complicates retention and deletion." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t("Custody is quietly transferred") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "A vendor that stores the record in its own tenancy becomes a second custodian of clinical data, which complicates retention and deletion."
+          ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border-hairline bg-card p-7 shadow-subtle", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: "Review is treated as optional" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: "Generated text that reaches the record without a clinician reading it is a clinical risk, not a time saving." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t("Review is treated as optional") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(
+            "Generated text that reaches the record without a clinician reading it is a clinical risk, not a time saving."
+          ) })
         ] })
       ] })
     ] }) }),
@@ -47575,8 +48804,8 @@ function SovereignDeploymentPage() {
                 }
               )
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-lg font-semibold text-foreground", children: item.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: item.description })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "mt-5 text-lg font-semibold text-foreground", children: t(item.title) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(item.description) })
           ]
         },
         item.id
@@ -47601,8 +48830,8 @@ function SovereignDeploymentPage() {
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 shrink-0 items-center justify-center rounded-lg bg-muted text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: pillar.title }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: pillar.description })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(pillar.title) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(pillar.description) })
               ] })
             ]
           },
@@ -47612,17 +48841,19 @@ function SovereignDeploymentPage() {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-12 rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-9", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "size-5 text-primary", "aria-hidden": "true" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: "Deployment details" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t("Deployment details") })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground", children: "Specific hosting regions and certifications are confirmed per deployment. Where a claim would normally appear, this page shows a placeholder until it is verified with your organisation." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground", children: t(
+          "Specific hosting regions and certifications are confirmed per deployment. Where a claim would normally appear, this page shows a placeholder until it is verified with your organisation."
+        ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("dl", { className: "mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2", children: DEPLOYMENT_FACTS.map((fact) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
             className: "border-t border-hairline pt-4",
             "data-ocid": `sovereign.fact.${fact.id}`,
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground", children: fact.label }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "mt-2 font-mono text-sm text-foreground", children: fact.value })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dt", { className: "text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground", children: t(fact.label) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("dd", { className: "mt-2 font-mono text-sm text-foreground", children: t(fact.value) })
             ]
           },
           fact.id
@@ -47647,7 +48878,7 @@ function SovereignDeploymentPage() {
               size: "lg",
               className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "/contact", "data-ocid": "sovereign.contact_button", children: [
-                "Contact us",
+                t("Contact us"),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
               ] })
             }
@@ -47659,7 +48890,7 @@ function SovereignDeploymentPage() {
               size: "lg",
               variant: "outline",
               className: "rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/pricing", "data-ocid": "sovereign.pricing_button", children: "View pricing" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/pricing", "data-ocid": "sovereign.pricing_button", children: t("View pricing") })
             }
           )
         ] })
@@ -47745,6 +48976,7 @@ const TIERS = [
   }
 ];
 function SponsorshipPage() {
+  const { t } = useTranslation();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHero,
@@ -47761,7 +48993,7 @@ function SponsorshipPage() {
             size: "lg",
             className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "/contact", "data-ocid": "sponsorship.primary_button", children: [
-              "Become a Sponsor",
+              t("Become a Sponsor"),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
             ] })
           }
@@ -47780,16 +49012,22 @@ function SponsorshipPage() {
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "mt-10 space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Underserved communities come first" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Sponsored subscriptions are directed to the clinicians and institutions serving communities with the least capacity to absorb documentation overhead." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Underserved communities come first") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Sponsored subscriptions are directed to the clinicians and institutions serving communities with the least capacity to absorb documentation overhead."
+            ) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "The subsidy is the subscription" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Sponsorship covers the metered subscription cost. It does not buy influence over clinical decisions, which stay with the treating clinician." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("The subsidy is the subscription") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Sponsorship covers the metered subscription cost. It does not buy influence over clinical decisions, which stay with the treating clinician."
+            ) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "border-l-2 border-primary/30 pl-5", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: "Access is governed, not gifted" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: "Sponsored access is administered through the same account and governance model as every other deployment on the platform." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-foreground", children: t("Access is governed, not gifted") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm leading-relaxed text-muted-foreground", children: t(
+              "Sponsored access is administered through the same account and governance model as every other deployment on the platform."
+            ) })
           ] })
         ] })
       ] }),
@@ -47821,8 +49059,8 @@ function SponsorshipPage() {
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "size-5", "aria-hidden": "true" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: category.title }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: category.description })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-foreground", children: t(category.title) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm leading-relaxed text-muted-foreground", children: t(category.description) })
               ] })
             ]
           },
@@ -47846,16 +49084,16 @@ function SponsorshipPage() {
           className: tier.featured ? "flex h-full flex-col rounded-xl border border-primary/50 bg-card p-8 shadow-elevated" : "flex h-full flex-col rounded-xl border-hairline bg-card p-8 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold tracking-tight text-foreground", children: tier.name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm font-semibold uppercase tracking-[0.12em] text-primary", children: tier.commitment }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-sm font-semibold uppercase tracking-[0.12em] text-primary", children: t(tier.commitment) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 font-display text-3xl font-bold tracking-tight text-foreground", children: tier.price }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-muted-foreground", children: tier.supports }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 flex-1 text-sm leading-relaxed text-muted-foreground", children: tier.description }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-muted-foreground", children: t(tier.supports) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-6 flex-1 text-sm leading-relaxed text-muted-foreground", children: t(tier.description) }),
             tier.custom ? /* @__PURE__ */ jsxRuntimeExports.jsx(
               "p",
               {
                 "data-ocid": `sponsorship.tier_custom_note.${index2 + 1}`,
                 className: "mt-6 rounded-lg border-hairline bg-muted px-4 py-3 text-sm font-semibold text-foreground",
-                children: "Custom — contact us."
+                children: t("Custom — contact us.")
               }
             ) : null
           ]
@@ -47867,7 +49105,9 @@ function SponsorshipPage() {
         {
           "data-ocid": "sponsorship.pricing_note",
           className: "mt-10 rounded-lg border-hairline bg-muted px-5 py-4 text-sm leading-relaxed text-muted-foreground",
-          children: "Sponsorship levels are based on Robi Care's published subscription pricing."
+          children: t(
+            "Sponsorship levels are based on Robi Care's published subscription pricing."
+          )
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -47877,7 +49117,7 @@ function SponsorshipPage() {
           size: "lg",
           className: "rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "/contact", "data-ocid": "sponsorship.tiers_button", children: [
-            "Become a Sponsor",
+            t("Become a Sponsor"),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { "aria-hidden": "true" })
           ] })
         }
@@ -47946,6 +49186,16 @@ const sponsorshipRoute = createRoute({
   path: "/sponsorship",
   component: SponsorshipPage
 });
+const healthcareDisclaimerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/healthcare-disclaimer",
+  component: HealthcareDisclaimerPage
+});
+const cookieNoticeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cookie-notice",
+  component: CookieNoticePage
+});
 const routeTree = rootRoute.addChildren([
   indexRoute,
   signUpRoute,
@@ -47956,7 +49206,9 @@ const routeTree = rootRoute.addChildren([
   aiGovernanceRoute,
   sovereignDeploymentRoute,
   partnershipsRoute,
-  sponsorshipRoute
+  sponsorshipRoute,
+  healthcareDisclaimerRoute,
+  cookieNoticeRoute
 ]);
 const router = createRouter({ routeTree });
 function App() {
@@ -47967,5 +49219,5 @@ BigInt.prototype.toJSON = function() {
 };
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(LanguageProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) }) })
 );

@@ -20,7 +20,7 @@ check-limit = 1
 
 [toolchain]
 moc = "1.16.0"
-lintoko = "0.11.0"
+lintoko = "0.12.0"
 
 [lint]
 extends = true
@@ -34,5 +34,5 @@ ic = "4.2.0"
 caffeineai-authorization = "1.0.1"
 caffeineai-lints = "0.1.1"
 caffeineai-oql = "0.6.2"
-caffeineai-email = "0.2.0"
+caffeineai-email = "0.3.1"
 base = "0.16.0"

@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -44,6 +45,8 @@ export function SectionHeading({
   align = "left",
   className,
 }: SectionHeadingProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       className={cn(
@@ -52,13 +55,13 @@ export function SectionHeading({
         className,
       )}
     >
-      <p className="eyebrow rule-accent inline-block pb-2">{eyebrow}</p>
+      <p className="eyebrow rule-accent inline-block pb-2">{t(eyebrow)}</p>
       <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-        {title}
+        {t(title)}
       </h2>
       {description ? (
         <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
-          {description}
+          {t(description)}
         </p>
       ) : null}
     </div>

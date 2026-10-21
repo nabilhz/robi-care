@@ -1,4 +1,5 @@
 import { ImagePanel } from "@/components/layout/ImagePanel";
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
@@ -20,12 +21,14 @@ type SolutionCardProps = {
 /**
  * A clinical use case presented as a media-and-copy card on the raised navy
  * surface. The photograph sits in its own hairline frame with a caption panel,
- * never behind the text; bullet markers use the cyan accent.
+ * never behind the text; bullet markers use the cyan accent. Copy is held in
+ * English source constants and translated at render time.
  */
 export function SolutionCard({
   solution,
   reversed = false,
 }: SolutionCardProps) {
+  const { t } = useTranslation();
   const Icon = solution.icon;
   return (
     <article
@@ -43,10 +46,10 @@ export function SolutionCard({
             <Icon aria-hidden="true" className="size-5" />
           </span>
           <h3 className="mt-6 text-xl font-bold uppercase tracking-tight text-foreground md:text-2xl">
-            {solution.title}
+            {t(solution.title)}
           </h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {solution.description}
+            {t(solution.description)}
           </p>
           <ul className="mt-6 space-y-2.5">
             {solution.points.map((point) => (
@@ -58,7 +61,7 @@ export function SolutionCard({
                   aria-hidden="true"
                   className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
                 />
-                {point}
+                {t(point)}
               </li>
             ))}
           </ul>

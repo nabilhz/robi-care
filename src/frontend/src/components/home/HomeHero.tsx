@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { HOME_HERO_COPY, HOME_HERO_CTAS, HOME_HERO_IMAGE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -31,6 +32,8 @@ const CTA_STYLES: Record<string, string> = {
  * fades to transparent; the fade tail carries no text.
  */
 export function HomeHero() {
+  const { t } = useTranslation();
+
   return (
     <section
       className="relative isolate w-full overflow-hidden bg-deep-green"
@@ -68,12 +71,12 @@ export function HomeHero() {
             />
 
             <div className="relative">
-              <p className="eyebrow mb-4">{HOME_HERO_COPY.eyebrow}</p>
+              <p className="eyebrow mb-4">{t(HOME_HERO_COPY.eyebrow)}</p>
               <h1 className="text-4xl font-bold uppercase leading-[1.02] tracking-tight text-foreground md:text-5xl lg:text-[2.75rem]">
-                {HOME_HERO_COPY.headline}
+                {t(HOME_HERO_COPY.headline)}
               </h1>
               <p className="mt-6 max-w-md text-base leading-relaxed text-foreground/85 md:text-lg">
-                {HOME_HERO_COPY.supporting}
+                {t(HOME_HERO_COPY.supporting)}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {HOME_HERO_CTAS.map((cta) => (
@@ -86,7 +89,7 @@ export function HomeHero() {
                       CTA_STYLES[cta.variant],
                     )}
                   >
-                    {cta.label}
+                    {t(cta.label)}
                     {cta.variant === "primary" ? (
                       <ArrowRight aria-hidden="true" className="size-4" />
                     ) : null}

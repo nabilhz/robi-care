@@ -1,6 +1,7 @@
 import { ContactForm } from "@/components/contact/ContactForm";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/layout/Section";
+import { useTranslation } from "@/i18n/useTranslation";
 import { Mail, MapPin, ShieldCheck } from "lucide-react";
 
 const DETAILS = [
@@ -29,6 +30,8 @@ const DETAILS = [
  * photograph in a solid caption panel.
  */
 export function ContactPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -68,13 +71,13 @@ export function ContactPage() {
                   />
                 </span>
                 <h3 className="mt-4 text-base font-semibold text-foreground">
-                  {detail.title}
+                  {t(detail.title)}
                 </h3>
                 <p className="mt-2 text-sm font-medium text-foreground">
-                  {detail.body}
+                  {t(detail.body)}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {detail.note}
+                  {t(detail.note)}
                 </p>
               </div>
             ))}

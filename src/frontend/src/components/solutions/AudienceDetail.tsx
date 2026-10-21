@@ -1,4 +1,5 @@
 import { ImagePanel } from "@/components/layout/ImagePanel";
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 
 export type AudienceDetailContent = {
@@ -21,12 +22,15 @@ type AudienceDetailProps = {
  * its own hairline frame with a solid caption panel; all body copy stays inside
  * the raised navy card beside it and is never overlaid on the image. The
  * human-review block is set on the deeper navy surface so the review step reads
- * as the decisive moment.
+ * as the decisive moment. Copy is held in English source constants and
+ * translated at render time.
  */
 export function AudienceDetail({
   audience,
   reversed = false,
 }: AudienceDetailProps) {
+  const { t } = useTranslation();
+
   return (
     <article
       data-ocid={`solutions.audience.${audience.id}`}
@@ -44,29 +48,29 @@ export function AudienceDetail({
         )}
       >
         <h3 className="text-xl font-bold uppercase tracking-tight text-foreground md:text-2xl">
-          {audience.name}
+          {t(audience.name)}
         </h3>
 
         <div className="mt-6">
-          <p className="eyebrow">The challenge</p>
+          <p className="eyebrow">{t("The challenge")}</p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {audience.challenge}
+            {t(audience.challenge)}
           </p>
         </div>
 
         <div className="mt-6">
-          <p className="eyebrow">How Robi Care helps</p>
+          <p className="eyebrow">{t("How Robi Care helps")}</p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {audience.help}
+            {t(audience.help)}
           </p>
         </div>
 
         <div className="mt-6 rounded-lg border border-primary/30 bg-deep-green p-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-            Where human review occurs
+            {t("Where human review occurs")}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-            {audience.review}
+            {t(audience.review)}
           </p>
         </div>
       </div>

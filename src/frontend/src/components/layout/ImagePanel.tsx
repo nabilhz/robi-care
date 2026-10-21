@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 
 type ImagePanelProps = {
@@ -23,6 +24,8 @@ export function ImagePanel({
   className,
   priority = false,
 }: ImagePanelProps) {
+  const { t } = useTranslation();
+
   return (
     <figure
       className={cn(
@@ -39,7 +42,7 @@ export function ImagePanel({
       />
       {caption ? (
         <figcaption className="border-t border-hairline bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground">
-          {caption}
+          {t(caption)}
         </figcaption>
       ) : null}
     </figure>

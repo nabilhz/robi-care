@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/i18n/useTranslation";
 import { useActor } from "@caffeineai/core-infrastructure";
 import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
@@ -24,19 +25,22 @@ const EMPTY_DRAFT: Record<FieldName, string> = {
 const FIELD_CLASS =
   "border-hairline bg-card text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/40";
 
-function validate(draft: Record<FieldName, string>): FieldErrors {
+function validate(
+  draft: Record<FieldName, string>,
+  t: (key: string) => string,
+): FieldErrors {
   const errors: FieldErrors = {};
-  if (!draft.name.trim()) errors.name = "Please enter your name.";
+  if (!draft.name.trim()) errors.name = t("Please enter your name.");
   if (!draft.email.trim()) {
-    errors.email = "Please enter your email address.";
+    errors.email = t("Please enter your email address.");
   } else if (!EMAIL_PATTERN.test(draft.email.trim())) {
-    errors.email = "Please enter a valid email address.";
+    errors.email = t("Please enter a valid email address.");
   }
   if (!draft.organisation.trim()) {
-    errors.organisation = "Please enter your organisation.";
+    errors.organisation = t("Please enter your organisation.");
   }
   if (!draft.message.trim()) {
-    errors.message = "Please tell us how we can help.";
+    errors.message = t("Please tell us how we can help.");
   }
   return errors;
 }
@@ -47,6 +51,7 @@ function validate(draft: Record<FieldName, string>): FieldErrors {
  * enquiry is stored.
  */
 export function ContactForm() {
+  const { t } = useTranslation();
   const { actor } = useActor(createActor);
   const [draft, setDraft] = useState<Record<FieldName, string>>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -78,7 +83,7 @@ export function ContactForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const nextErrors = validate(draft);
+    const nextErrors = validate(draft, t);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
@@ -122,11 +127,12 @@ export function ContactForm() {
           <CheckCircle2 aria-hidden="true" className="h-6 w-6 text-primary" />
         </span>
         <h3 className="mt-5 text-xl font-semibold text-foreground">
-          Thank you — your enquiry has been sent
+          {t("Thank you — your enquiry has been sent")}
         </h3>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Your message has reached the Robi Care team at hello@tmu.ai. We
-          usually respond within one business day.
+          {t(
+            "Your message has reached the Robi Care team at hello@tmu.ai. We usually respond within one business day.",
+          )}
         </p>
         <Button
           type="button"
@@ -135,7 +141,7 @@ export function ContactForm() {
           data-ocid="contact.send_another_button"
           onClick={() => setSubmitted(false)}
         >
-          Send another enquiry
+          {t("Send another enquiry")}
         </Button>
       </div>
     );
@@ -151,7 +157,7 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <Label htmlFor="contact-name" className="text-foreground">
-            Name
+            {t("Name")}
           </Label>
           <Input
             id="contact-name"
@@ -171,7 +177,7 @@ export function ContactForm() {
 
         <div>
           <Label htmlFor="contact-email" className="text-foreground">
-            Email
+            {t("Email")}
           </Label>
           <Input
             id="contact-email"
@@ -193,7 +199,7 @@ export function ContactForm() {
 
       <div className="mt-5">
         <Label htmlFor="contact-organisation" className="text-foreground">
-          Organisation
+          {t("Organisation")}
         </Label>
         <Input
           id="contact-organisation"
@@ -215,7 +221,7 @@ export function ContactForm() {
 
       <div className="mt-5">
         <Label htmlFor="contact-message" className="text-foreground">
-          Message
+          {t("Message")}
         </Label>
         <Textarea
           id="contact-message"
@@ -241,8 +247,9 @@ export function ContactForm() {
           className="mt-5 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
           <AlertCircle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
-          We could not send your enquiry just now. Please try again, or email
-          hello@tmu.ai directly.
+          {t(
+            "We could not send your enquiry just now. Please try again, or email hello@tmu.ai directly.",
+          )}
         </p>
       ) : null}
 
@@ -256,11 +263,11 @@ export function ContactForm() {
         {mutation.isPending ? (
           <>
             <Loader2 aria-hidden="true" className="animate-spin" />
-            Sending…
+            {t("Sending…")}
           </>
         ) : (
           <>
-            Send enquiry
+            {t("Send enquiry")}
             <Send aria-hidden="true" />
           </>
         )}

@@ -2,6 +2,7 @@ import { AccountStep } from "@/components/signup/AccountStep";
 import { DashboardStep } from "@/components/signup/DashboardStep";
 import { OnboardingSteps } from "@/components/signup/OnboardingSteps";
 import { VerificationStep } from "@/components/signup/VerificationStep";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   ACCOUNT_STEP_COPY,
   type AccountDraft,
@@ -20,6 +21,7 @@ import { useState } from "react";
  * no real verification, and no billing logic.
  */
 export function SignUpPage() {
+  const { t } = useTranslation();
   const [step, setStep] = useState<SignupStepId>(1);
   const [draft, setDraft] = useState<AccountDraft>(EMPTY_ACCOUNT_DRAFT);
   const [errors, setErrors] = useState<AccountErrors>({});
@@ -55,13 +57,13 @@ export function SignUpPage() {
       <div className="container">
         <div className="mx-auto max-w-3xl">
           <p className="eyebrow rule-accent inline-block pb-2">
-            {SIGNUP_HEADER.eyebrow}
+            {t(SIGNUP_HEADER.eyebrow)}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-            {SIGNUP_HEADER.title}
+            {t(SIGNUP_HEADER.title)}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            {SIGNUP_HEADER.description}
+            {t(SIGNUP_HEADER.description)}
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export function SignUpPage() {
 
           {step === 1 ? (
             <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-              {ACCOUNT_STEP_COPY.description}
+              {t(ACCOUNT_STEP_COPY.description)}
             </p>
           ) : null}
         </div>

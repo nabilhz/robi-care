@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Fragment } from "react";
@@ -22,6 +23,8 @@ type WorkflowDiagramProps = {
  * cyan-tinted arrow. The row wraps onto a second line on narrow viewports.
  */
 export function WorkflowDiagram({ className }: WorkflowDiagramProps) {
+  const { t } = useTranslation();
+
   return (
     <ol
       data-ocid="keyboard.workflow.list"
@@ -40,7 +43,7 @@ export function WorkflowDiagram({ className }: WorkflowDiagramProps) {
               aria-hidden="true"
               className="size-1.5 shrink-0 rounded-full bg-primary"
             />
-            {step}
+            {t(step)}
           </li>
           {index < WORKFLOW_STEPS.length - 1 ? (
             <li aria-hidden="true" className="flex items-center">

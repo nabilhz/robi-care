@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export type GovernanceQuestion = {
   question: string;
@@ -20,6 +21,8 @@ type GovernanceFaqProps = {
  * dark navy card surfaces with thin subtle borders and a cyan accent rule.
  */
 export function GovernanceFaq({ items }: GovernanceFaqProps) {
+  const { t } = useTranslation();
+
   return (
     <Accordion type="single" collapsible className="w-full space-y-3">
       {items.map((item, index) => (
@@ -32,10 +35,10 @@ export function GovernanceFaq({ items }: GovernanceFaqProps) {
             data-ocid={`governance.faq.item.${index + 1}`}
             className="py-5 text-left text-base font-semibold text-foreground hover:text-primary hover:no-underline md:text-lg"
           >
-            {item.question}
+            {t(item.question)}
           </AccordionTrigger>
           <AccordionContent className="border-t border-hairline pb-5 pt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {item.answer}
+            {t(item.answer)}
           </AccordionContent>
         </AccordionItem>
       ))}

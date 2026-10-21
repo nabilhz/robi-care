@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   ACCOUNT_STEP_COPY,
   type AccountDraft,
@@ -31,6 +32,7 @@ export function AccountStep({
   onChange,
   onContinue,
 }: AccountStepProps) {
+  const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -47,7 +49,7 @@ export function AccountStep({
         className="mt-2 flex items-center gap-1.5 text-sm text-destructive"
       >
         <AlertCircle aria-hidden="true" className="h-4 w-4 shrink-0" />
-        {errors[field]}
+        {t(errors[field] as string)}
       </p>
     ) : null;
 
@@ -63,18 +65,18 @@ export function AccountStep({
       data-ocid="signup.account_form"
       className="rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8"
     >
-      <p className="eyebrow">{ACCOUNT_STEP_COPY.eyebrow}</p>
+      <p className="eyebrow">{t(ACCOUNT_STEP_COPY.eyebrow)}</p>
       <h2 className="mt-3 text-2xl font-semibold text-foreground md:text-3xl">
-        {ACCOUNT_STEP_COPY.title}
+        {t(ACCOUNT_STEP_COPY.title)}
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        {ACCOUNT_STEP_COPY.description}
+        {t(ACCOUNT_STEP_COPY.description)}
       </p>
 
       <div className="mt-7 space-y-5">
         <div>
           <Label htmlFor="signup-full-name" className="text-foreground">
-            Full Name
+            {t("Full Name")}
           </Label>
           <Input
             id="signup-full-name"
@@ -96,7 +98,7 @@ export function AccountStep({
 
         <div>
           <Label htmlFor="signup-email" className="text-foreground">
-            Email Address
+            {t("Email Address")}
           </Label>
           <Input
             id="signup-email"
@@ -119,7 +121,7 @@ export function AccountStep({
 
         <div>
           <Label htmlFor="signup-phone" className="text-foreground">
-            Mobile Phone Number
+            {t("Mobile Phone Number")}
           </Label>
           <Input
             id="signup-phone"
@@ -147,7 +149,7 @@ export function AccountStep({
         className="mt-7 w-full rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-accent/90 hover:shadow-elevated sm:w-auto"
         data-ocid="signup.continue_button"
       >
-        Continue
+        {t("Continue")}
         <ArrowRight aria-hidden="true" />
       </Button>
     </form>

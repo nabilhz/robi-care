@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import { Check, X } from "lucide-react";
 
@@ -47,6 +48,7 @@ function ComparisonCard({
   title: string;
   items: ComparisonItem[];
 }) {
+  const { t } = useTranslation();
   const isAfter = tone === "after";
   const Icon = isAfter ? Check : X;
 
@@ -64,10 +66,10 @@ function ComparisonCard({
           isAfter ? "text-primary" : "text-muted-foreground",
         )}
       >
-        {eyebrow}
+        {t(eyebrow)}
       </p>
       <h3 className="mt-3 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-        {title}
+        {t(title)}
       </h3>
       <ul className="mt-6 space-y-4">
         {items.map((item) => (
@@ -84,10 +86,10 @@ function ComparisonCard({
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-semibold text-foreground">
-                {item.label}
+                {t(item.label)}
               </span>
               <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
-                {item.detail}
+                {t(item.detail)}
               </span>
             </span>
           </li>

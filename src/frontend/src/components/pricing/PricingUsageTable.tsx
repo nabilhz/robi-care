@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 
 type UsageCell = {
@@ -58,9 +59,13 @@ const USAGE_ROWS: UsageRow[] = [
  * Three-tier monthly usage comparison table on the dark navy canvas. Every cell
  * renders light foreground text on the navy surface, spec values stay in the
  * monospace face, and hairline rules separate the rows. The wrapper scrolls
- * horizontally on narrow screens rather than clipping its columns.
+ * horizontally on narrow screens rather than clipping its columns. Column and
+ * row labels are translated at render time; tier names, allowances, unit counts
+ * and US$ amounts are unchanged.
  */
 export function PricingUsageTable() {
+  const { t } = useTranslation();
+
   return (
     <div
       data-ocid="pricing.usage_table"
@@ -68,7 +73,9 @@ export function PricingUsageTable() {
     >
       <table className="w-full min-w-[46rem] border-collapse text-left text-sm text-foreground">
         <caption className="sr-only">
-          Monthly usage breakdown by tier, with unit counts and US$ amounts
+          {t(
+            "Monthly usage breakdown by tier, with unit counts and US$ amounts",
+          )}
         </caption>
         <thead>
           <tr className="border-b border-border">
@@ -76,7 +83,7 @@ export function PricingUsageTable() {
               scope="col"
               className="w-[28%] px-5 py-5 align-bottom text-xs font-bold uppercase tracking-[0.14em] text-foreground"
             >
-              Units
+              {t("Units")}
             </th>
             {TIER_COLUMNS.map((tier) => (
               <th
@@ -99,7 +106,7 @@ export function PricingUsageTable() {
               scope="col"
               className="px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-foreground"
             >
-              Number of Units
+              {t("Number of Units")}
             </th>
             {TIER_COLUMNS.map((tier) => (
               <th
@@ -107,7 +114,7 @@ export function PricingUsageTable() {
                 scope="col"
                 className="px-5 py-3 text-right text-xs font-bold uppercase tracking-[0.14em] text-foreground"
               >
-                US$
+                {t("US$")}
               </th>
             ))}
           </tr>
@@ -123,7 +130,7 @@ export function PricingUsageTable() {
                 scope="row"
                 className="px-5 py-5 text-left align-top font-medium text-foreground"
               >
-                {row.label}
+                {t(row.label)}
               </th>
               {row.cells.map((cell, index) => (
                 <td

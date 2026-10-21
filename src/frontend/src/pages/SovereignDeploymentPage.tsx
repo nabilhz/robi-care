@@ -3,6 +3,7 @@ import { ImagePanel } from "@/components/layout/ImagePanel";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import { GET_STARTED_URL } from "@/lib/site";
 import {
   ArrowRight,
@@ -125,9 +126,12 @@ const DEPLOYMENT_FACTS = [
 
 /**
  * Sovereign Deployment page: the problem, the workflow, the proof points, and
- * a closing call to action.
+ * a closing call to action. Copy is held in English source constants and
+ * translated at render time.
  */
 export function SovereignDeploymentPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -147,7 +151,7 @@ export function SovereignDeploymentPage() {
             className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
           >
             <a href={GET_STARTED_URL} data-ocid="sovereign.primary_button">
-              Get Started
+              {t("Get Started")}
               <ArrowRight aria-hidden="true" />
             </a>
           </Button>
@@ -158,7 +162,7 @@ export function SovereignDeploymentPage() {
             className="rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary"
           >
             <a href="/contact" data-ocid="sovereign.secondary_button">
-              Talk to the team
+              {t("Talk to the team")}
             </a>
           </Button>
         </div>
@@ -184,10 +188,10 @@ export function SovereignDeploymentPage() {
                 </span>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">
-                    {pillar.title}
+                    {t(pillar.title)}
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {pillar.description}
+                    {t(pillar.description)}
                   </p>
                 </div>
               </article>
@@ -206,31 +210,32 @@ export function SovereignDeploymentPage() {
           <div className="space-y-6">
             <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle">
               <h3 className="text-lg font-semibold text-foreground">
-                The boundary becomes unclear
+                {t("The boundary becomes unclear")}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Once content leaves the clinical environment, the provider can
-                no longer describe the processing boundary in terms its own
-                governance process recognises.
+                {t(
+                  "Once content leaves the clinical environment, the provider can no longer describe the processing boundary in terms its own governance process recognises.",
+                )}
               </p>
             </div>
             <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle">
               <h3 className="text-lg font-semibold text-foreground">
-                Custody is quietly transferred
+                {t("Custody is quietly transferred")}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                A vendor that stores the record in its own tenancy becomes a
-                second custodian of clinical data, which complicates retention
-                and deletion.
+                {t(
+                  "A vendor that stores the record in its own tenancy becomes a second custodian of clinical data, which complicates retention and deletion.",
+                )}
               </p>
             </div>
             <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle">
               <h3 className="text-lg font-semibold text-foreground">
-                Review is treated as optional
+                {t("Review is treated as optional")}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Generated text that reaches the record without a clinician
-                reading it is a clinical risk, not a time saving.
+                {t(
+                  "Generated text that reaches the record without a clinician reading it is a clinical risk, not a time saving.",
+                )}
               </p>
             </div>
           </div>
@@ -261,10 +266,10 @@ export function SovereignDeploymentPage() {
                 />
               </div>
               <h3 className="mt-5 text-lg font-semibold text-foreground">
-                {item.title}
+                {t(item.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {item.description}
+                {t(item.description)}
               </p>
             </li>
           ))}
@@ -291,10 +296,10 @@ export function SovereignDeploymentPage() {
                 </span>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">
-                    {pillar.title}
+                    {t(pillar.title)}
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {pillar.description}
+                    {t(pillar.description)}
                   </p>
                 </div>
               </article>
@@ -306,13 +311,13 @@ export function SovereignDeploymentPage() {
           <div className="flex items-center gap-3">
             <MapPin className="size-5 text-primary" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-foreground">
-              Deployment details
+              {t("Deployment details")}
             </h3>
           </div>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Specific hosting regions and certifications are confirmed per
-            deployment. Where a claim would normally appear, this page shows a
-            placeholder until it is verified with your organisation.
+            {t(
+              "Specific hosting regions and certifications are confirmed per deployment. Where a claim would normally appear, this page shows a placeholder until it is verified with your organisation.",
+            )}
           </p>
           <dl className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2">
             {DEPLOYMENT_FACTS.map((fact) => (
@@ -322,10 +327,10 @@ export function SovereignDeploymentPage() {
                 data-ocid={`sovereign.fact.${fact.id}`}
               >
                 <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {fact.label}
+                  {t(fact.label)}
                 </dt>
                 <dd className="mt-2 font-mono text-sm text-foreground">
-                  {fact.value}
+                  {t(fact.value)}
                 </dd>
               </div>
             ))}
@@ -348,7 +353,7 @@ export function SovereignDeploymentPage() {
                 className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
               >
                 <a href="/contact" data-ocid="sovereign.contact_button">
-                  Contact us
+                  {t("Contact us")}
                   <ArrowRight aria-hidden="true" />
                 </a>
               </Button>
@@ -359,7 +364,7 @@ export function SovereignDeploymentPage() {
                 className="rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary"
               >
                 <a href="/pricing" data-ocid="sovereign.pricing_button">
-                  View pricing
+                  {t("View pricing")}
                 </a>
               </Button>
             </div>

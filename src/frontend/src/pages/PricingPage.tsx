@@ -6,6 +6,7 @@ import {
   PricingTierCard,
 } from "@/components/pricing/PricingTierCard";
 import { PricingUsageTable } from "@/components/pricing/PricingUsageTable";
+import { useTranslation } from "@/i18n/useTranslation";
 
 const TIERS: PricingTier[] = [
   {
@@ -106,9 +107,12 @@ const INCLUDED = [
 
 /**
  * Pricing page: the three tiers, the base unit rates behind them, and a
- * closing call to action.
+ * closing call to action. Copy is translated at render time; tier names,
+ * prices and numbers are passed through unchanged.
  */
 export function PricingPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -141,11 +145,11 @@ export function PricingPage() {
           className="mt-10 rounded-lg border-hairline bg-muted px-5 py-4 text-sm leading-relaxed text-muted-foreground"
         >
           <span className="font-bold uppercase tracking-[0.12em] text-primary">
-            Base unit rates:
+            {t("Base unit rates:")}
           </span>{" "}
-          Speech-to-Text Transcription $0.074/minute · Access to ChatGPT $0.02
-          per 1,000 tokens · Audio Recording $5.25/GB per month. Monthly totals
-          are the sum of the metered components shown for each tier.
+          {t(
+            "Speech-to-Text Transcription $0.074/minute · Access to ChatGPT $0.02 per 1,000 tokens · Audio Recording $5.25/GB per month. Monthly totals are the sum of the metered components shown for each tier.",
+          )}
         </p>
       </Section>
 
@@ -162,10 +166,10 @@ export function PricingPage() {
               className="rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:shadow-elevated"
             >
               <h3 className="text-lg font-semibold text-foreground">
-                {item.title}
+                {t(item.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {item.description}
+                {t(item.description)}
               </p>
             </div>
           ))}

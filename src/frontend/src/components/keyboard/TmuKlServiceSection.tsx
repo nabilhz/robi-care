@@ -1,4 +1,5 @@
 import { Section, SectionHeading } from "@/components/layout/Section";
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import {
   CalendarCheck,
@@ -54,6 +55,7 @@ const BENEFITS: { icon: LucideIcon; title: string; description: string }[] = [
  */
 export function TmuKlServiceSection() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <Section id="tmu-kl-service" alt>
@@ -69,7 +71,7 @@ export function TmuKlServiceSection() {
             {isPlaying ? (
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0`}
-                title={VIDEO_TITLE}
+                title={t(VIDEO_TITLE)}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 className="absolute inset-0 size-full border-0"
@@ -78,13 +80,13 @@ export function TmuKlServiceSection() {
               <button
                 type="button"
                 onClick={() => setIsPlaying(true)}
-                aria-label={`Play video: ${VIDEO_TITLE}`}
+                aria-label={`${t("Play video:")} ${t(VIDEO_TITLE)}`}
                 data-ocid="keyboard.video.play_button"
                 className="group absolute inset-0 flex size-full items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <img
                   src={VIDEO_POSTER.src}
-                  alt={VIDEO_POSTER.alt}
+                  alt={t(VIDEO_POSTER.alt)}
                   loading="lazy"
                   decoding="async"
                   className="absolute inset-0 size-full object-cover"
@@ -100,17 +102,18 @@ export function TmuKlServiceSection() {
             )}
           </div>
           <p className="border-t border-hairline bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground">
-            The walkthrough plays inline on this page. Nothing is loaded from
-            YouTube until you press play.
+            {t(
+              "The walkthrough plays inline on this page. Nothing is loaded from YouTube until you press play.",
+            )}
           </p>
         </div>
 
         <div>
           <p className="eyebrow rule-accent inline-block pb-2">
-            What it changes
+            {t("What it changes")}
           </p>
           <h3 className="mt-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            Four gains for the clinician
+            {t("Four gains for the clinician")}
           </h3>
           <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
             {BENEFITS.map((benefit, index) => (
@@ -126,10 +129,10 @@ export function TmuKlServiceSection() {
                   <benefit.icon className="size-5" aria-hidden="true" />
                 </span>
                 <h4 className="mt-5 text-base font-semibold tracking-tight text-foreground">
-                  {benefit.title}
+                  {t(benefit.title)}
                 </h4>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {benefit.description}
+                  {t(benefit.description)}
                 </p>
               </li>
             ))}
@@ -139,13 +142,12 @@ export function TmuKlServiceSection() {
 
       <div className="mt-12 max-w-3xl border-l-2 border-primary/30 pl-5">
         <p className="text-base font-semibold text-foreground">
-          AI may assist. The clinician decides.
+          {t("AI may assist. The clinician decides.")}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          The service assists with documentation and drafting only. It does not
-          diagnose, prescribe, or act. A qualified clinician reviews and
-          approves all clinical content before it is used, and nothing generated
-          reaches the patient record without that sign-off.
+          {t(
+            "The service assists with documentation and drafting only. It does not diagnose, prescribe, or act. A qualified clinician reviews and approves all clinical content before it is used, and nothing generated reaches the patient record without that sign-off.",
+          )}
         </p>
       </div>
     </Section>

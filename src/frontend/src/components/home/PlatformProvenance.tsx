@@ -1,4 +1,5 @@
 import { Section, SectionHeading } from "@/components/layout/Section";
+import { useTranslation } from "@/i18n/useTranslation";
 import { PROVENANCE_LINE } from "@/lib/site";
 import { Layers, ShieldCheck, Workflow } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -36,6 +37,8 @@ const PILLARS: Pillar[] = [
  * with cyan icon accents.
  */
 export function PlatformProvenance() {
+  const { t } = useTranslation();
+
   return (
     <Section id="platform" alt>
       <SectionHeading
@@ -55,17 +58,17 @@ export function PlatformProvenance() {
                 <Icon aria-hidden="true" className="size-5" />
               </span>
               <h3 className="mt-6 text-lg font-bold uppercase tracking-tight text-foreground">
-                {pillar.title}
+                {t(pillar.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {pillar.description}
+                {t(pillar.description)}
               </p>
             </div>
           );
         })}
       </div>
       <p className="mt-10 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
-        {PROVENANCE_LINE}
+        {t(PROVENANCE_LINE)}
       </p>
     </Section>
   );

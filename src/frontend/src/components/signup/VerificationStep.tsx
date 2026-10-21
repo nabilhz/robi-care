@@ -4,6 +4,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { useTranslation } from "@/i18n/useTranslation";
 import { VERIFICATION_STEP_COPY, isValidVerificationCode } from "@/lib/signup";
 import { ArrowLeft, ArrowRight, MailCheck, ShieldCheck } from "lucide-react";
 import { type FormEvent, useState } from "react";
@@ -23,6 +24,7 @@ export function VerificationStep({
   onVerify,
   onBack,
 }: VerificationStepProps) {
+  const { t } = useTranslation();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -45,19 +47,19 @@ export function VerificationStep({
         <MailCheck aria-hidden="true" className="h-6 w-6 text-primary" />
       </span>
 
-      <p className="eyebrow mt-5">{VERIFICATION_STEP_COPY.eyebrow}</p>
+      <p className="eyebrow mt-5">{t(VERIFICATION_STEP_COPY.eyebrow)}</p>
       <h2 className="mt-3 text-2xl font-semibold text-foreground md:text-3xl">
-        {VERIFICATION_STEP_COPY.title}
+        {t(VERIFICATION_STEP_COPY.title)}
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        {VERIFICATION_STEP_COPY.description}
+        {t(VERIFICATION_STEP_COPY.description)}
       </p>
 
       <p
         data-ocid="signup.sent_to_email"
         className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border-hairline bg-muted px-4 py-2 text-sm font-medium text-foreground"
       >
-        <span className="text-muted-foreground">Sent to</span>
+        <span className="text-muted-foreground">{t("Sent to")}</span>
         <span className="truncate font-mono text-primary">{email}</span>
       </p>
 
@@ -66,7 +68,7 @@ export function VerificationStep({
           htmlFor="signup-verification-code"
           className="text-sm font-medium text-foreground"
         >
-          Verification code
+          {t("Verification code")}
         </label>
         <div className="mt-3">
           <InputOTP
@@ -102,7 +104,7 @@ export function VerificationStep({
             data-ocid="signup.code_error"
             className="mt-3 text-sm text-destructive"
           >
-            {error}
+            {t(error)}
           </p>
         ) : null}
 
@@ -111,7 +113,7 @@ export function VerificationStep({
             aria-hidden="true"
             className="mt-0.5 h-4 w-4 shrink-0 text-primary"
           />
-          {VERIFICATION_STEP_COPY.kycNote}
+          {t(VERIFICATION_STEP_COPY.kycNote)}
         </p>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -121,7 +123,7 @@ export function VerificationStep({
             className="w-full rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-accent/90 hover:shadow-elevated sm:w-auto"
             data-ocid="signup.verify_button"
           >
-            Verify
+            {t("Verify")}
             <ArrowRight aria-hidden="true" />
           </Button>
           <Button
@@ -133,7 +135,7 @@ export function VerificationStep({
             data-ocid="signup.back_button"
           >
             <ArrowLeft aria-hidden="true" />
-            Back to details
+            {t("Back to details")}
           </Button>
         </div>
       </form>

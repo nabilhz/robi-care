@@ -1,4 +1,5 @@
 import { Section, SectionHeading } from "@/components/layout/Section";
+import { useTranslation } from "@/i18n/useTranslation";
 import { CalendarCheck, FileText, Mic } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -39,6 +40,8 @@ const STEPS: Step[] = [
  * card surface.
  */
 export function HowItWorks() {
+  const { t } = useTranslation();
+
   return (
     <Section id="how-it-works" alt>
       <SectionHeading
@@ -64,10 +67,10 @@ export function HowItWorks() {
                 </span>
               </div>
               <h3 className="mt-6 text-lg font-bold uppercase tracking-tight text-foreground">
-                {item.title}
+                {t(item.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {item.description}
+                {t(item.description)}
               </p>
             </li>
           );

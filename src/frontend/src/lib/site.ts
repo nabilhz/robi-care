@@ -116,10 +116,10 @@ export const HERO_IMAGE = {
   alt: "A clinician in a white coat reviewing patient notes on a tablet at a light oak desk in a bright, uncluttered consultation room.",
 };
 
-/** Full-width Home hero photograph: physician and patient in genuine eye contact. */
+/** Full-width Home hero photograph: physician examining a young child's ear. */
 export const HOME_HERO_IMAGE = {
   src: "/assets/generated/hero-eye-contact-consultation.dim_1920x1080.jpg",
-  alt: "A physician in a white coat sitting face to face with a seated patient in a bright consultation room, holding warm eye contact during their conversation.",
+  alt: "A physician examining a young child's ear with an otoscope, with the child's mother present and a colleague nearby, in a clinic exam room.",
 };
 
 export const HOME_HERO_COPY = {

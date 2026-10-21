@@ -6,6 +6,7 @@ import { ImagePanel } from "@/components/layout/ImagePanel";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import { GET_STARTED_URL } from "@/lib/site";
 import {
   ArrowRight,
@@ -129,6 +130,8 @@ const PROOF_POINTS = [
  * works, proof points, and a closing call to action.
  */
 export function KeyboardLiberationPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -144,7 +147,7 @@ export function KeyboardLiberationPage() {
           className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
         >
           <a href={GET_STARTED_URL} data-ocid="keyboard.primary_button">
-            Get Started
+            {t("Get Started")}
             <ArrowRight aria-hidden="true" />
           </a>
         </Button>
@@ -158,15 +161,9 @@ export function KeyboardLiberationPage() {
               title="Let clinicians face patients again."
             />
             <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Clinical documentation is indispensable, but the keyboard should
-              not stand between a healthcare professional and the person seeking
-              care. Robi Care uses consent-based, AI-assisted, multilingual
-              voice documentation to transform authorized clinical conversations
-              into reviewable drafts, summaries and structured records — just
-              speak to it in your own language. The clinician remains
-              responsible for verifying, correcting and approving the resulting
-              clinical documentation — this human sign-off is a safety control,
-              not an inconvenience.
+              {t(
+                "Clinical documentation is indispensable, but the keyboard should not stand between a healthcare professional and the person seeking care. Robi Care uses consent-based, AI-assisted, multilingual voice documentation to transform authorized clinical conversations into reviewable drafts, summaries and structured records — just speak to it in your own language. The clinician remains responsible for verifying, correcting and approving the resulting clinical documentation — this human sign-off is a safety control, not an inconvenience.",
+              )}
             </p>
           </div>
           <ImagePanel
@@ -188,11 +185,9 @@ export function KeyboardLiberationPage() {
         />
         <WorkflowDiagram className="mt-12" />
         <p className="mx-auto mt-10 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          This approach reflects the broader case made by Dr. Eric Topol for
-          AI-assisted, ambient clinical documentation that frees physicians to
-          focus on patients rather than data entry. Robi Care applies this
-          thinking within a governed, consent-based workflow. This page does not
-          imply that Dr. Topol endorses Robi Care.
+          {t(
+            "This approach reflects the broader case made by Dr. Eric Topol for AI-assisted, ambient clinical documentation that frees physicians to focus on patients rather than data entry. Robi Care applies this thinking within a governed, consent-based workflow. This page does not imply that Dr. Topol endorses Robi Care.",
+          )}
         </p>
       </Section>
 
@@ -226,13 +221,13 @@ export function KeyboardLiberationPage() {
                 <step.icon className="size-5" aria-hidden="true" />
               </span>
               <p className="mt-5 font-mono text-xs uppercase tracking-[0.18em] text-primary">
-                Step {index + 1}
+                {t("Step")} {index + 1}
               </p>
               <h3 className="mt-2 text-lg font-semibold tracking-tight text-foreground">
-                {step.title}
+                {t(step.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {step.description}
+                {t(step.description)}
               </p>
             </li>
           ))}
@@ -254,14 +249,14 @@ export function KeyboardLiberationPage() {
                   className="border-l-2 border-primary/30 pl-5"
                 >
                   <dt className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
-                    {point.value}
+                    {t(point.value)}
                   </dt>
                   <dd className="mt-1">
                     <span className="block text-base font-semibold text-foreground">
-                      {point.label}
+                      {t(point.label)}
                     </span>
                     <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
-                      {point.detail}
+                      {t(point.detail)}
                     </span>
                   </dd>
                 </div>

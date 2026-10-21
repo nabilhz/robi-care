@@ -3,6 +3,7 @@ import { ImagePanel } from "@/components/layout/ImagePanel";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   ArrowRight,
   Building2,
@@ -101,6 +102,8 @@ const TIERS: SponsorshipTier[] = [
  * healthcare access, the sponsor categories, and the three sponsorship tiers.
  */
 export function SponsorshipPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -116,7 +119,7 @@ export function SponsorshipPage() {
           className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
         >
           <a href="/contact" data-ocid="sponsorship.primary_button">
-            Become a Sponsor
+            {t("Become a Sponsor")}
             <ArrowRight aria-hidden="true" />
           </a>
         </Button>
@@ -133,31 +136,32 @@ export function SponsorshipPage() {
             <ul className="mt-10 space-y-6">
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Underserved communities come first
+                  {t("Underserved communities come first")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Sponsored subscriptions are directed to the clinicians and
-                  institutions serving communities with the least capacity to
-                  absorb documentation overhead.
+                  {t(
+                    "Sponsored subscriptions are directed to the clinicians and institutions serving communities with the least capacity to absorb documentation overhead.",
+                  )}
                 </p>
               </li>
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  The subsidy is the subscription
+                  {t("The subsidy is the subscription")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Sponsorship covers the metered subscription cost. It does not
-                  buy influence over clinical decisions, which stay with the
-                  treating clinician.
+                  {t(
+                    "Sponsorship covers the metered subscription cost. It does not buy influence over clinical decisions, which stay with the treating clinician.",
+                  )}
                 </p>
               </li>
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Access is governed, not gifted
+                  {t("Access is governed, not gifted")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Sponsored access is administered through the same account and
-                  governance model as every other deployment on the platform.
+                  {t(
+                    "Sponsored access is administered through the same account and governance model as every other deployment on the platform.",
+                  )}
                 </p>
               </li>
             </ul>
@@ -190,10 +194,10 @@ export function SponsorshipPage() {
                 </span>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">
-                    {category.title}
+                    {t(category.title)}
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {category.description}
+                    {t(category.description)}
                   </p>
                 </div>
               </article>
@@ -223,23 +227,23 @@ export function SponsorshipPage() {
                 {tier.name}
               </h3>
               <p className="mt-3 text-sm font-semibold uppercase tracking-[0.12em] text-primary">
-                {tier.commitment}
+                {t(tier.commitment)}
               </p>
               <p className="mt-6 font-display text-3xl font-bold tracking-tight text-foreground">
                 {tier.price}
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                {tier.supports}
+                {t(tier.supports)}
               </p>
               <p className="mt-6 flex-1 text-sm leading-relaxed text-muted-foreground">
-                {tier.description}
+                {t(tier.description)}
               </p>
               {tier.custom ? (
                 <p
                   data-ocid={`sponsorship.tier_custom_note.${index + 1}`}
                   className="mt-6 rounded-lg border-hairline bg-muted px-4 py-3 text-sm font-semibold text-foreground"
                 >
-                  Custom — contact us.
+                  {t("Custom — contact us.")}
                 </p>
               ) : null}
             </article>
@@ -250,8 +254,9 @@ export function SponsorshipPage() {
           data-ocid="sponsorship.pricing_note"
           className="mt-10 rounded-lg border-hairline bg-muted px-5 py-4 text-sm leading-relaxed text-muted-foreground"
         >
-          Sponsorship levels are based on Robi Care's published subscription
-          pricing.
+          {t(
+            "Sponsorship levels are based on Robi Care's published subscription pricing.",
+          )}
         </p>
 
         <div className="mt-10">
@@ -261,7 +266,7 @@ export function SponsorshipPage() {
             className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
           >
             <a href="/contact" data-ocid="sponsorship.tiers_button">
-              Become a Sponsor
+              {t("Become a Sponsor")}
               <ArrowRight aria-hidden="true" />
             </a>
           </Button>

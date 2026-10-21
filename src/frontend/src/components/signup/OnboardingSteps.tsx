@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { SIGNUP_STEPS, type SignupStepId } from "@/lib/signup";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
@@ -12,10 +13,12 @@ type OnboardingStepsProps = {
  * between markers fills cyan once the earlier step is complete.
  */
 export function OnboardingSteps({ current }: OnboardingStepsProps) {
+  const { t } = useTranslation();
+
   return (
     <ol
       data-ocid="signup.steps"
-      aria-label="Sign up progress"
+      aria-label={t("Sign up progress")}
       className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-0"
     >
       {SIGNUP_STEPS.map((step, index) => {
@@ -54,10 +57,10 @@ export function OnboardingSteps({ current }: OnboardingStepsProps) {
                     : "text-muted-foreground",
                 )}
               >
-                {step.label}
+                {t(step.label)}
               </span>
               <span className="block truncate text-xs text-muted-foreground">
-                {step.description}
+                {t(step.description)}
               </span>
             </span>
 

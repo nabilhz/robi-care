@@ -1,18 +1,19 @@
 {
-  "overview": "Robi Care is a clinical marketing site for the TMU Enablement Platform, covering keyboard liberation, AI governance, sovereign deployment, pricing, and partnerships.",
+  "overview": "Bilingual marketing site for Robi Care, a clinical AI platform, with a full English and French (France) experience and an EN / FR toggle in the header.",
   "features": [
-    "Keyboard Liberation page with a new TMU-KL service section",
-    "Inline click-to-play video introducing the TMU-KL service",
-    "Clinician benefit cards for voice-driven documentation",
-    "Governance language: AI may assist, the clinician decides",
-    "AI Governance, Sovereign Deployment, Pricing, and Partnerships pages"
+    "EN / FR language toggle in the header on every page",
+    "Complete French (France) translation of every page, navigation, forms and footer",
+    "Language choice remembered across pages and return visits",
+    "Clinical safety wording preserved with identical meaning and force",
+    "Prices, tier names and numbers identical in both languages"
   ],
-  "category": "landing-page",
+  "category": "marketing-site",
   "tags": [
     "healthcare",
-    "clinical-documentation",
-    "marketing-site",
-    "ai-governance"
+    "bilingual",
+    "french",
+    "clinical-ai",
+    "marketing"
   ],
-  "last_updated": "2026-09-19T16:04:50.776Z"
+  "last_updated": "2026-10-07T14:43:06.373Z"
 }

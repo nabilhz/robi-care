@@ -1,4 +1,5 @@
 import { Section, SectionHeading } from "@/components/layout/Section";
+import { useTranslation } from "@/i18n/useTranslation";
 import { HOME_AUDIENCES, HOME_SAFETY_BANNER } from "@/lib/site";
 import type { AudienceIconName } from "@/lib/site";
 import {
@@ -26,6 +27,8 @@ const AUDIENCE_ICONS: Record<AudienceIconName, LucideIcon> = {
  * never carry text over an image.
  */
 export function AudienceSection() {
+  const { t } = useTranslation();
+
   return (
     <Section id="audiences">
       <SectionHeading
@@ -47,10 +50,10 @@ export function AudienceSection() {
                 <Icon aria-hidden="true" className="size-5" />
               </span>
               <h3 className="mt-5 text-base font-bold uppercase leading-snug tracking-tight text-foreground">
-                {audience.label}
+                {t(audience.label)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {audience.value}
+                {t(audience.value)}
               </p>
             </li>
           );
@@ -65,7 +68,7 @@ export function AudienceSection() {
           <ShieldCheck aria-hidden="true" className="size-5" />
         </span>
         <p className="text-sm font-medium leading-relaxed text-foreground md:text-base">
-          {HOME_SAFETY_BANNER}
+          {t(HOME_SAFETY_BANNER)}
         </p>
       </div>
     </Section>

@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import { ArrowDown } from "lucide-react";
 
@@ -49,6 +50,8 @@ const BRANCHES = [
  * branches sit side by side from the `sm` breakpoint up.
  */
 export function GovernanceArchitectureDiagram() {
+  const { t } = useTranslation();
+
   return (
     <figure
       data-ocid="governance.diagram"
@@ -56,60 +59,65 @@ export function GovernanceArchitectureDiagram() {
     >
       <figcaption className="mb-8 max-w-2xl">
         <h3 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
-          Governance architecture
+          {t("Governance architecture")}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          How a request moves from a care team member to a signed clinical
-          record, and where identity, policy, evidence and human review sit in
-          that path.
+          {t(
+            "How a request moves from a care team member to a signed clinical record, and where identity, policy, evidence and human review sit in that path.",
+          )}
         </p>
       </figcaption>
 
       <ol className="mx-auto flex max-w-3xl list-none flex-col items-stretch">
         <li>
-          <DiagramNode label="Clinician/Nurse/EMS/Administrator" />
+          <DiagramNode label={t("Clinician/Nurse/EMS/Administrator")} />
         </li>
         <li>
           <FlowArrow />
         </li>
         <li>
-          <DiagramNode label="Robi Care PWA" />
+          <DiagramNode label={t("Robi Care PWA")} />
         </li>
         <li>
           <FlowArrow />
         </li>
         <li>
-          <DiagramNode label="Identity, Consent and Role Controls" emphasis />
+          <DiagramNode
+            label={t("Identity, Consent and Role Controls")}
+            emphasis
+          />
         </li>
         <li>
           <FlowArrow />
         </li>
         <li>
-          <DiagramNode label="SSOT-AI-GOV Policy Gates" emphasis />
+          <DiagramNode label={t("SSOT-AI-GOV Policy Gates")} emphasis />
         </li>
         <li>
-          <FlowArrow label="parallel branches" />
+          <FlowArrow label={t("parallel branches")} />
         </li>
         <li>
           <ul className="grid list-none gap-4 sm:grid-cols-2">
             {BRANCHES.map((branch) => (
               <li key={branch}>
-                <DiagramNode label={branch} />
+                <DiagramNode label={t(branch)} />
               </li>
             ))}
           </ul>
         </li>
         <li>
-          <FlowArrow label="converge" />
+          <FlowArrow label={t("converge")} />
         </li>
         <li>
-          <DiagramNode label="Approved AI Models and Clinical/Administrative Systems" />
+          <DiagramNode
+            label={t("Approved AI Models and Clinical/Administrative Systems")}
+          />
         </li>
         <li>
           <FlowArrow />
         </li>
         <li>
-          <DiagramNode label="Clinician Review and Sign-off" emphasis />
+          <DiagramNode label={t("Clinician Review and Sign-off")} emphasis />
         </li>
       </ol>
     </figure>

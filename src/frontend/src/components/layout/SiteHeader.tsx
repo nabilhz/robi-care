@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { LANGUAGES } from "@/i18n/translations";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   ACCOUNT_DEMO_URL,
   HEADER_BANNER_TEXT,
@@ -13,7 +15,50 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+/**
+ * EN / FR segmented toggle. Shows the active language and switches with one
+ * action; the choice is held by the language provider, so the visitor stays on
+ * the current page and section.
+ */
+function LanguageToggle({ className }: { className?: string }) {
+  const { language, setLanguage, t } = useTranslation();
+
+  return (
+    <fieldset
+      data-ocid="nav.language_toggle"
+      className={cn(
+        "inline-flex items-center gap-0.5 rounded-full border-hairline bg-card p-0.5",
+        className,
+      )}
+    >
+      <legend className="sr-only">{t("Language")}</legend>
+      {LANGUAGES.map((option) => {
+        const isActive = language === option.code;
+        return (
+          <button
+            key={option.code}
+            type="button"
+            onClick={() => setLanguage(option.code)}
+            aria-pressed={isActive}
+            aria-label={option.label}
+            data-ocid={`nav.language.${option.code}`}
+            className={cn(
+              "min-h-11 rounded-full px-3 text-xs font-bold uppercase tracking-[0.12em] transition-smooth focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 xl:min-h-9",
+              isActive
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground/70 hover:bg-muted hover:text-foreground",
+            )}
+          >
+            {option.shortLabel}
+          </button>
+        );
+      })}
+    </fieldset>
+  );
+}
+
 export function SiteHeader() {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -40,7 +85,7 @@ export function SiteHeader() {
       >
         <div className="container">
           <p className="py-2 text-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-primary">
-            {HEADER_BANNER_TEXT}
+            {t(HEADER_BANNER_TEXT)}
           </p>
         </div>
       </div>
@@ -49,7 +94,7 @@ export function SiteHeader() {
         <div className="flex h-20 items-center justify-between gap-4 md:h-24">
           <Link
             to="/"
-            aria-label={`${SITE_NAME} home`}
+            aria-label={t(`${SITE_NAME} home`)}
             className="flex min-w-0 items-center rounded-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
             data-ocid="nav.home_link"
           >
@@ -68,7 +113,7 @@ export function SiteHeader() {
           </Link>
 
           <nav
-            aria-label="Primary"
+            aria-label={t("Primary")}
             className="hidden items-center gap-1 xl:flex"
             data-ocid="nav.primary"
           >
@@ -85,7 +130,7 @@ export function SiteHeader() {
                     : "text-foreground/75 hover:bg-muted hover:text-foreground",
                 )}
               >
-                {item.label}
+                {t(item.label)}
                 {isActive(item.to) ? (
                   <span
                     aria-hidden="true"
@@ -97,13 +142,14 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden items-center gap-2 xl:flex">
+            <LanguageToggle />
             <Button
               asChild
               variant="outline"
               className="rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary"
             >
               <a href={ACCOUNT_DEMO_URL} data-ocid="nav.account_demo_button">
-                Account demo
+                {t("Account demo")}
               </a>
             </Button>
             <Button
@@ -111,7 +157,7 @@ export function SiteHeader() {
               className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
             >
               <Link to={SIGN_UP_ROUTE} data-ocid="nav.sign_up_button">
-                {SIGN_UP_LABEL}
+                {t(SIGN_UP_LABEL)}
               </Link>
             </Button>
           </div>
@@ -122,7 +168,7 @@ export function SiteHeader() {
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             aria-label={
-              menuOpen ? "Close navigation menu" : "Open navigation menu"
+              menuOpen ? t("Close navigation menu") : t("Open navigation menu")
             }
             data-ocid="nav.menu_toggle"
             className="grid size-11 place-items-center rounded-lg border-hairline bg-card text-foreground transition-smooth hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 xl:hidden"
@@ -143,7 +189,7 @@ export function SiteHeader() {
           className="border-t border-hairline bg-card xl:hidden"
         >
           <div className="container py-4">
-            <nav aria-label="Mobile" className="flex flex-col">
+            <nav aria-label={t("Mobile")} className="flex flex-col">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.to}
@@ -158,11 +204,12 @@ export function SiteHeader() {
                       : "text-foreground hover:bg-muted",
                   )}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               ))}
             </nav>
             <div className="mt-4 flex flex-col gap-2 border-t border-hairline pt-4">
+              <LanguageToggle className="self-start" />
               <Button
                 asChild
                 variant="outline"
@@ -172,7 +219,7 @@ export function SiteHeader() {
                   href={ACCOUNT_DEMO_URL}
                   data-ocid="nav.mobile_account_demo_button"
                 >
-                  Account demo
+                  {t("Account demo")}
                 </a>
               </Button>
               <Button
@@ -184,7 +231,7 @@ export function SiteHeader() {
                   onClick={() => setMenuOpen(false)}
                   data-ocid="nav.mobile_sign_up_button"
                 >
-                  {SIGN_UP_LABEL}
+                  {t(SIGN_UP_LABEL)}
                 </Link>
               </Button>
             </div>

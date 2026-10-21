@@ -9,6 +9,7 @@ import {
   type Solution,
   SolutionCard,
 } from "@/components/solutions/SolutionCard";
+import { useTranslation } from "@/i18n/useTranslation";
 import { GET_STARTED_URL } from "@/lib/site";
 import { ArrowRight, CalendarCheck, FileText, Mic } from "lucide-react";
 
@@ -26,7 +27,7 @@ const SOLUTIONS: Solution[] = [
     icon: Mic,
     image: {
       src: "/assets/generated/solution-conversation-capture.dim_1536x1024.jpg",
-      alt: "A clinician speaking with a patient across a light wooden table in a bright consultation room.",
+      alt: "A physician attending to a toddler seated on an exam table, with a colleague present.",
     },
   },
   {
@@ -145,6 +146,8 @@ const AUDIENCES: AudienceDetailContent[] = [
  * closing call to action.
  */
 export function SolutionsPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -185,29 +188,32 @@ export function SolutionsPage() {
           <div className="space-y-6">
             <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated">
               <h3 className="text-lg font-bold uppercase tracking-tight text-foreground">
-                No new clinical process
+                {t("No new clinical process")}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                The consultation stays a conversation. Robi Care works in the
-                background and presents its output for review afterwards.
+                {t(
+                  "The consultation stays a conversation. Robi Care works in the background and presents its output for review afterwards.",
+                )}
               </p>
             </div>
             <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated">
               <h3 className="text-lg font-bold uppercase tracking-tight text-foreground">
-                Judgement stays clinical
+                {t("Judgement stays clinical")}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Suggestions are drafts. The clinician decides what is accurate,
-                what is relevant, and what belongs in the record.
+                {t(
+                  "Suggestions are drafts. The clinician decides what is accurate, what is relevant, and what belongs in the record.",
+                )}
               </p>
             </div>
             <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle transition-smooth hover:border-primary/40 hover:shadow-elevated">
               <h3 className="text-lg font-bold uppercase tracking-tight text-foreground">
-                One platform underneath
+                {t("One platform underneath")}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Robi Care runs on the TMU · TeleMeetUp Enablement Platform, so
-                governance and integrations are shared rather than duplicated.
+                {t(
+                  "Robi Care runs on the TMU · TeleMeetUp Enablement Platform, so governance and integrations are shared rather than duplicated.",
+                )}
               </p>
             </div>
           </div>
@@ -250,7 +256,7 @@ export function SolutionsPage() {
               data-ocid="solutions.primary_button"
               className="btn-primary"
             >
-              Get Started
+              {t("Get Started")}
               <ArrowRight aria-hidden="true" className="size-4" />
             </a>
             <a
@@ -258,7 +264,7 @@ export function SolutionsPage() {
               data-ocid="solutions.secondary_button"
               className="btn-secondary"
             >
-              Contact us
+              {t("Contact us")}
             </a>
           </div>
         </div>

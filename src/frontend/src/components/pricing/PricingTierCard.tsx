@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import { GET_STARTED_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Check } from "lucide-react";
@@ -28,9 +29,12 @@ type PricingTierCardProps = {
  * A single pricing tier on the dark navy card surface: headline allowance, the
  * three metered line items, and the monthly total. The featured tier carries a
  * cyan ring and cyan badge; its action is the solid cyan primary button while
- * the other tiers use the cyan-outlined secondary button.
+ * the other tiers use the cyan-outlined secondary button. Labels are translated
+ * at render time; the tier name, allowance, prices and totals are unchanged.
  */
 export function PricingTierCard({ tier, index }: PricingTierCardProps) {
+  const { t } = useTranslation();
+
   return (
     <article
       data-ocid={`pricing.card.${index + 1}`}
@@ -43,19 +47,19 @@ export function PricingTierCard({ tier, index }: PricingTierCardProps) {
         <div>
           <h3 className="text-xl font-semibold text-foreground">{tier.name}</h3>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {tier.tagline}
+            {t(tier.tagline)}
           </p>
         </div>
         {tier.featured ? (
           <span className="shrink-0 rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-primary">
-            Most popular
+            {t("Most popular")}
           </span>
         ) : null}
       </div>
 
       <div className="mt-6 rounded-lg border-hairline bg-muted px-5 py-4">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          Transcription allowance
+          {t("Transcription allowance")}
         </p>
         <p className="mt-1 font-display text-2xl font-semibold text-foreground">
           {tier.transcriptionHours}
@@ -74,10 +78,10 @@ export function PricingTierCard({ tier, index }: PricingTierCardProps) {
                   aria-hidden="true"
                   className="h-4 w-4 shrink-0 text-primary"
                 />
-                {item.label}
+                {t(item.label)}
               </p>
               <p className="mt-1 pl-6 text-xs leading-relaxed text-muted-foreground">
-                {item.detail}
+                {t(item.detail)}
               </p>
             </div>
             <p className="shrink-0 font-mono text-sm font-medium text-foreground">
@@ -89,7 +93,7 @@ export function PricingTierCard({ tier, index }: PricingTierCardProps) {
 
       <div className="mt-6 flex items-baseline justify-between border-t border-hairline pt-5">
         <span className="text-sm font-medium text-muted-foreground">
-          Monthly total
+          {t("Monthly total")}
         </span>
         <span className="font-mono text-2xl font-semibold text-foreground">
           {tier.total}
@@ -111,7 +115,7 @@ export function PricingTierCard({ tier, index }: PricingTierCardProps) {
           href={GET_STARTED_URL}
           data-ocid={`pricing.get_started_button.${index + 1}`}
         >
-          Get Started
+          {t("Get Started")}
           <ArrowRight aria-hidden="true" />
         </a>
       </Button>

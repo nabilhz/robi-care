@@ -5,6 +5,7 @@ import { ImagePanel } from "@/components/layout/ImagePanel";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import { GET_STARTED_URL } from "@/lib/site";
 import { ArrowRight, Eye, FileSearch, Lock, UserCheck } from "lucide-react";
 
@@ -97,6 +98,8 @@ const FAQ_ITEMS = [
  * decision control, transparency, and data handling.
  */
 export function AiGovernancePage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -112,7 +115,7 @@ export function AiGovernancePage() {
           className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
         >
           <a href={GET_STARTED_URL} data-ocid="governance.primary_button">
-            Get Started
+            {t("Get Started")}
             <ArrowRight aria-hidden="true" />
           </a>
         </Button>
@@ -122,14 +125,15 @@ export function AiGovernancePage() {
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
           <div>
             <p className="eyebrow rule-accent inline-block pb-2">
-              HUMAN AUTHORITY BY DESIGN
+              {t("HUMAN AUTHORITY BY DESIGN")}
             </p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-              AI may assist. The clinician decides.
+              {t("AI may assist. The clinician decides.")}
             </h2>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Robi Care combines clinical workflow support with policy gates,
-              human authorization and traceable evidence through SSOT-AI-GOV.
+              {t(
+                "Robi Care combines clinical workflow support with policy gates, human authorization and traceable evidence through SSOT-AI-GOV.",
+              )}
             </p>
             <div className="mt-8">
               <a
@@ -137,7 +141,7 @@ export function AiGovernancePage() {
                 className="btn-primary"
                 data-ocid="governance.opening_button"
               >
-                See the governance architecture
+                {t("See the governance architecture")}
                 <ArrowRight aria-hidden="true" />
               </a>
             </div>
@@ -145,20 +149,22 @@ export function AiGovernancePage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
             <div className="rounded-xl border-hairline bg-card p-6 shadow-subtle">
               <h3 className="text-base font-semibold text-foreground">
-                Fail-closed
+                {t("Fail-closed")}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Restricted actions are denied when authorization, required
-                evidence or governance services are unavailable.
+                {t(
+                  "Restricted actions are denied when authorization, required evidence or governance services are unavailable.",
+                )}
               </p>
             </div>
             <div className="rounded-xl border-hairline bg-card p-6 shadow-subtle">
               <h3 className="text-base font-semibold text-foreground">
-                Review first
+                {t("Review first")}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Draft clinical content remains visibly unapproved until an
-                authorized professional signs off.
+                {t(
+                  "Draft clinical content remains visibly unapproved until an authorized professional signs off.",
+                )}
               </p>
             </div>
           </div>
@@ -182,10 +188,10 @@ export function AiGovernancePage() {
                 <principle.icon className="size-5" aria-hidden="true" />
               </span>
               <h3 className="mt-5 text-lg font-semibold tracking-tight text-foreground md:text-xl">
-                {principle.title}
+                {t(principle.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
-                {principle.description}
+                {t(principle.description)}
               </p>
             </article>
           ))}
@@ -212,7 +218,7 @@ export function AiGovernancePage() {
                 className="mt-2 size-2 shrink-0 rounded-full bg-primary"
               />
               <span className="text-base leading-relaxed text-foreground">
-                {principle}
+                {t(principle)}
               </span>
             </li>
           ))}
@@ -232,7 +238,7 @@ export function AiGovernancePage() {
           data-ocid="governance.failsafe_note"
           className="mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground"
         >
-          {FAIL_SAFE_NOTE}
+          {t(FAIL_SAFE_NOTE)}
         </p>
       </Section>
 
@@ -252,29 +258,32 @@ export function AiGovernancePage() {
             <ul className="mt-10 space-y-6">
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Policy outcomes are visible
+                  {t("Policy outcomes are visible")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Each decision shows which policy applied and whether the
-                  action proceeded, required approval, or was denied.
+                  {t(
+                    "Each decision shows which policy applied and whether the action proceeded, required approval, or was denied.",
+                  )}
                 </p>
               </li>
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Exceptions are reviewable
+                  {t("Exceptions are reviewable")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Denials and approval requests are surfaced for review rather
-                  than silently dropped.
+                  {t(
+                    "Denials and approval requests are surfaced for review rather than silently dropped.",
+                  )}
                 </p>
               </li>
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Controls can be suspended
+                  {t("Controls can be suspended")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Administrators can stop workflows, models, integrations or
-                  user privileges when oversight requires it.
+                  {t(
+                    "Administrators can stop workflows, models, integrations or user privileges when oversight requires it.",
+                  )}
                 </p>
               </li>
             </ul>
@@ -298,29 +307,32 @@ export function AiGovernancePage() {
             <ul className="mt-10 space-y-6">
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  The system drafts, the clinician decides
+                  {t("The system drafts, the clinician decides")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Robi Care organises what was said into a structured note. It
-                  does not diagnose, prescribe, or act.
+                  {t(
+                    "Robi Care organises what was said into a structured note. It does not diagnose, prescribe, or act.",
+                  )}
                 </p>
               </li>
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Approval is the gate to the record
+                  {t("Approval is the gate to the record")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Nothing generated reaches the patient record without a
-                  clinician's explicit approval.
+                  {t(
+                    "Nothing generated reaches the patient record without a clinician's explicit approval.",
+                  )}
                 </p>
               </li>
               <li className="border-l-2 border-primary/30 pl-5">
                 <p className="text-base font-semibold text-foreground">
-                  Corrections are first-class
+                  {t("Corrections are first-class")}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Editing a draft is a normal part of the workflow, not a
-                  failure state. The clinician's version is the note.
+                  {t(
+                    "Editing a draft is a normal part of the workflow, not a failure state. The clinician's version is the note.",
+                  )}
                 </p>
               </li>
             </ul>
@@ -337,29 +349,32 @@ export function AiGovernancePage() {
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           <div className="rounded-xl border-hairline bg-card p-6 shadow-subtle">
             <h3 className="text-base font-semibold text-foreground">
-              Purpose-limited processing
+              {t("Purpose-limited processing")}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Captured conversation is used to prepare the clinician's note and
-              for nothing else.
+              {t(
+                "Captured conversation is used to prepare the clinician's note and for nothing else.",
+              )}
             </p>
           </div>
           <div className="rounded-xl border-hairline bg-card p-6 shadow-subtle">
             <h3 className="text-base font-semibold text-foreground">
-              Clinic-controlled policy
+              {t("Clinic-controlled policy")}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Retention and access follow the clinic's own policies, applied to
-              the documentation workflow.
+              {t(
+                "Retention and access follow the clinic's own policies, applied to the documentation workflow.",
+              )}
             </p>
           </div>
           <div className="rounded-xl border-hairline bg-card p-6 shadow-subtle">
             <h3 className="text-base font-semibold text-foreground">
-              Deployment specifics
+              {t("Deployment specifics")}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Hosting arrangements and certifications are [certification/region
-              to be confirmed] and are agreed with each clinic.
+              {t(
+                "Hosting arrangements and certifications are [certification/region to be confirmed] and are agreed with each clinic.",
+              )}
             </p>
           </div>
         </div>

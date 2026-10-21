@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
   BILLING_SUMMARY,
   DASHBOARD_STEP_COPY,
@@ -43,6 +44,7 @@ type DashboardStepProps = {
  * surfaces. The platform note explains the figures are not yet live.
  */
 export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
+  const { t } = useTranslation();
   const [role, setRole] = useState("");
   const [organisation, setOrganisation] = useState("");
 
@@ -56,18 +58,18 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
           aria-hidden="true"
           className="mt-0.5 h-4 w-4 shrink-0 text-primary"
         />
-        <p className="font-medium">{DASHBOARD_STEP_COPY.previewBanner}</p>
+        <p className="font-medium">{t(DASHBOARD_STEP_COPY.previewBanner)}</p>
       </div>
 
       <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="eyebrow">{DASHBOARD_STEP_COPY.eyebrow}</p>
+            <p className="eyebrow">{t(DASHBOARD_STEP_COPY.eyebrow)}</p>
             <h2 className="mt-3 text-2xl font-semibold text-foreground md:text-3xl">
-              {DASHBOARD_STEP_COPY.title}
+              {t(DASHBOARD_STEP_COPY.title)}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              {DASHBOARD_STEP_COPY.description}
+              {t(DASHBOARD_STEP_COPY.description)}
             </p>
           </div>
           {fullName ? (
@@ -83,16 +85,16 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
 
         <div className="mt-8 border-t border-hairline pt-8">
           <h3 className="text-lg font-semibold text-foreground">
-            {DASHBOARD_STEP_COPY.personalInfoTitle}
+            {t(DASHBOARD_STEP_COPY.personalInfoTitle)}
           </h3>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {DASHBOARD_STEP_COPY.personalInfoDescription}
+            {t(DASHBOARD_STEP_COPY.personalInfoDescription)}
           </p>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <div>
               <Label htmlFor="signup-role" className="text-foreground">
-                Professional role / specialty
+                {t("Professional role / specialty")}
               </Label>
               <Input
                 id="signup-role"
@@ -100,20 +102,20 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
                 list="signup-role-options"
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
-                placeholder="e.g. Emergency Physician"
+                placeholder={t("e.g. Emergency Physician")}
                 className={FIELD_CLASS}
                 data-ocid="signup.role_input"
               />
               <datalist id="signup-role-options">
                 {ROLE_OPTIONS.map((option) => (
-                  <option key={option} value={option} />
+                  <option key={option} value={t(option)} />
                 ))}
               </datalist>
             </div>
 
             <div>
               <Label htmlFor="signup-organisation" className="text-foreground">
-                Organization / practice name
+                {t("Organization / practice name")}
               </Label>
               <Input
                 id="signup-organisation"
@@ -121,7 +123,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
                 autoComplete="organization"
                 value={organisation}
                 onChange={(event) => setOrganisation(event.target.value)}
-                placeholder="e.g. Northshore Family Practice"
+                placeholder={t("e.g. Northshore Family Practice")}
                 className={FIELD_CLASS}
                 data-ocid="signup.organisation_input"
               />
@@ -136,7 +138,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
             <TrendingUp aria-hidden="true" className="h-5 w-5 text-primary" />
           </span>
           <h3 className="text-lg font-semibold text-foreground">
-            {DASHBOARD_STEP_COPY.usageTitle}
+            {t(DASHBOARD_STEP_COPY.usageTitle)}
           </h3>
         </div>
 
@@ -148,13 +150,13 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
               className="rounded-lg border-hairline bg-muted p-5"
             >
               <dt className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                {metric.label}
+                {t(metric.label)}
               </dt>
               <dd className="mt-3 font-display text-2xl font-bold text-foreground">
                 {metric.value}
               </dd>
               <dd className="mt-1 text-xs text-muted-foreground">
-                {metric.detail}
+                {t(metric.detail)}
               </dd>
             </div>
           ))}
@@ -167,7 +169,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
             <Receipt aria-hidden="true" className="h-5 w-5 text-primary" />
           </span>
           <h3 className="text-lg font-semibold text-foreground">
-            {DASHBOARD_STEP_COPY.billingTitle}
+            {t(DASHBOARD_STEP_COPY.billingTitle)}
           </h3>
         </div>
 
@@ -181,7 +183,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
             </p>
           </div>
           <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary">
-            {BILLING_SUMMARY.status}
+            {t(BILLING_SUMMARY.status)}
           </span>
         </div>
 
@@ -191,12 +193,12 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
               key={line.id}
               className="flex items-center justify-between gap-4 text-sm"
             >
-              <dt className="text-muted-foreground">{line.label}</dt>
+              <dt className="text-muted-foreground">{t(line.label)}</dt>
               <dd className="font-mono text-foreground">{line.value}</dd>
             </div>
           ))}
           <div className="flex items-center justify-between gap-4 border-t border-hairline pt-3 text-sm font-semibold">
-            <dt className="text-foreground">{BILLING_SUMMARY.totalLabel}</dt>
+            <dt className="text-foreground">{t(BILLING_SUMMARY.totalLabel)}</dt>
             <dd className="font-mono text-primary">{BILLING_SUMMARY.amount}</dd>
           </div>
         </dl>
@@ -204,21 +206,27 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
 
       <div className="rounded-xl border-hairline bg-card p-7 shadow-subtle md:p-8">
         <h3 className="text-lg font-semibold text-foreground">
-          {DASHBOARD_STEP_COPY.invoicesTitle}
+          {t(DASHBOARD_STEP_COPY.invoicesTitle)}
         </h3>
 
         <div className="mt-6">
           <Table data-ocid="signup.invoice_table">
             <TableHeader>
               <TableRow className="border-hairline">
-                <TableHead className="text-muted-foreground">Invoice</TableHead>
-                <TableHead className="text-muted-foreground">Period</TableHead>
-                <TableHead className="text-muted-foreground">Issued</TableHead>
-                <TableHead className="text-right text-muted-foreground">
-                  Amount
+                <TableHead className="text-muted-foreground">
+                  {t("Invoice")}
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  {t("Period")}
+                </TableHead>
+                <TableHead className="text-muted-foreground">
+                  {t("Issued")}
                 </TableHead>
                 <TableHead className="text-right text-muted-foreground">
-                  Status
+                  {t("Amount")}
+                </TableHead>
+                <TableHead className="text-right text-muted-foreground">
+                  {t("Status")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -250,7 +258,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
                           : "bg-muted text-muted-foreground",
                       )}
                     >
-                      {row.status}
+                      {t(row.status)}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -268,7 +276,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
           aria-hidden="true"
           className="mt-0.5 h-4 w-4 shrink-0 text-primary"
         />
-        {DASHBOARD_STEP_COPY.platformNote}
+        {t(DASHBOARD_STEP_COPY.platformNote)}
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -281,7 +289,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
           data-ocid="signup.start_over_button"
         >
           <RotateCcw aria-hidden="true" />
-          Start over
+          {t("Start over")}
         </Button>
         <Button
           asChild
@@ -290,7 +298,7 @@ export function DashboardStep({ fullName, onStartOver }: DashboardStepProps) {
         >
           <Link to="/" data-ocid="signup.return_home_button">
             <ArrowLeft aria-hidden="true" />
-            Return home
+            {t("Return home")}
           </Link>
         </Button>
       </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import { Building2, Layers, Network } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -19,9 +20,12 @@ type PartnerModelsProps = {
 /**
  * Three-up grid of partnership models. Each card follows the media, title,
  * metadata, action hierarchy on the dark navy card surface with a hairline
- * border, cyan icon tile, and cyan bullet markers.
+ * border, cyan icon tile, and cyan bullet markers. Copy is held in English
+ * source constants and translated at render time.
  */
 export function PartnerModels({ models, className }: PartnerModelsProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       className={cn("grid gap-6 md:grid-cols-2 lg:grid-cols-3", className)}
@@ -39,13 +43,13 @@ export function PartnerModels({ models, className }: PartnerModelsProps) {
               <Icon className="size-5" aria-hidden="true" />
             </span>
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-primary">
-              {model.audience}
+              {t(model.audience)}
             </p>
             <h3 className="mt-2 text-xl font-semibold text-foreground">
-              {model.title}
+              {t(model.title)}
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {model.description}
+              {t(model.description)}
             </p>
             <ul className="mt-6 space-y-3 border-t border-hairline pt-6">
               {model.points.map((point) => (
@@ -57,7 +61,7 @@ export function PartnerModels({ models, className }: PartnerModelsProps) {
                     className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
                     aria-hidden="true"
                   />
-                  <span>{point}</span>
+                  <span>{t(point)}</span>
                 </li>
               ))}
             </ul>

@@ -7,6 +7,7 @@ import {
   PartnerModels,
 } from "@/components/partnerships/PartnerModels";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/useTranslation";
 import { GET_STARTED_URL } from "@/lib/site";
 import {
   ArrowRight,
@@ -148,6 +149,8 @@ const PARTNER_STEPS = [
  * and a call to action for partnership enquiries.
  */
 export function PartnershipsPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <PageHero
@@ -167,7 +170,7 @@ export function PartnershipsPage() {
             className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
           >
             <a href="/contact" data-ocid="partnerships.primary_button">
-              Contact for partnership
+              {t("Contact for partnership")}
               <ArrowRight aria-hidden="true" />
             </a>
           </Button>
@@ -178,7 +181,7 @@ export function PartnershipsPage() {
             className="rounded-full border-primary bg-transparent font-bold uppercase tracking-[0.12em] text-primary hover:bg-primary/10 hover:text-primary"
           >
             <a href={GET_STARTED_URL} data-ocid="partnerships.secondary_button">
-              Get Started
+              {t("Get Started")}
             </a>
           </Button>
         </div>
@@ -190,10 +193,9 @@ export function PartnershipsPage() {
           title="How the model is structured"
         />
         <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground md:text-lg">
-          Robi Care is deployed through Public-Private Partnerships (PPP) with
-          private enterprise, NGOs and local or national government in each
-          country. Ecocarrier Inc. provides Robi Care, the TMU Enablement
-          Platform and the SAAAS implementation and technical support.
+          {t(
+            "Robi Care is deployed through Public-Private Partnerships (PPP) with private enterprise, NGOs and local or national government in each country. Ecocarrier Inc. provides Robi Care, the TMU Enablement Platform and the SAAAS implementation and technical support.",
+          )}
         </p>
 
         <ImagePanel
@@ -209,8 +211,9 @@ export function PartnershipsPage() {
             data-ocid="partnerships.ppp_table"
           >
             <caption className="sr-only">
-              Participants in the Robi Care Public-Private Partnership model and
-              their roles
+              {t(
+                "Participants in the Robi Care Public-Private Partnership model and their roles",
+              )}
             </caption>
             <thead className="bg-section-alt">
               <tr>
@@ -218,13 +221,13 @@ export function PartnershipsPage() {
                   scope="col"
                   className="w-[38%] px-4 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-foreground sm:px-6"
                 >
-                  Participant
+                  {t("Participant")}
                 </th>
                 <th
                   scope="col"
                   className="px-4 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-foreground sm:px-6"
                 >
-                  Role
+                  {t("Role")}
                 </th>
               </tr>
             </thead>
@@ -239,10 +242,10 @@ export function PartnershipsPage() {
                     scope="row"
                     className="break-words px-4 py-4 text-sm font-semibold text-foreground sm:px-6"
                   >
-                    {row.participant}
+                    {t(row.participant)}
                   </th>
                   <td className="break-words px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-6">
-                    {row.role}
+                    {t(row.role)}
                   </td>
                 </tr>
               ))}
@@ -281,10 +284,10 @@ export function PartnershipsPage() {
                   </span>
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">
-                      {capability.title}
+                      {t(capability.title)}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                      {capability.description}
+                      {t(capability.description)}
                     </p>
                   </div>
                 </article>
@@ -311,10 +314,10 @@ export function PartnershipsPage() {
                 {item.step}
               </span>
               <h3 className="mt-4 text-lg font-semibold text-foreground">
-                {item.title}
+                {t(item.title)}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {item.description}
+                {t(item.description)}
               </p>
             </li>
           ))}
@@ -341,7 +344,7 @@ export function PartnershipsPage() {
                 className="rounded-full bg-primary font-bold uppercase tracking-[0.12em] text-primary-foreground hover:bg-primary/90"
               >
                 <a href="/contact" data-ocid="partnerships.contact_button">
-                  Contact for partnership
+                  {t("Contact for partnership")}
                   <ArrowRight aria-hidden="true" />
                 </a>
               </Button>
@@ -355,7 +358,7 @@ export function PartnershipsPage() {
                   href="/sovereign-deployment"
                   data-ocid="partnerships.deployment_button"
                 >
-                  Deployment model
+                  {t("Deployment model")}
                 </a>
               </Button>
             </div>
